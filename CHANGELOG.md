@@ -1,6 +1,6 @@
 # ChangeLog for Light Coding
 
-## [1.1] - 2026-05-16
+## [1.1 Version] - 2026-05-16
 ### Added
 
 - New Exploit Functions: getgenv, executor, clipboard, writefile, readfile, isfile, makefolder, isfolder, hookfunction, hookmetamethod, getnamecallmethod, checkaller, newcclosure, readonly, setreadonly, makewriteable, isreadonly, getgc
