@@ -1,61 +1,66 @@
 ## Work in Progress(WIP)
+---
 ## Light Coding
   Make your coding easier!
-  Loadstring :
+  - Loadstring :
   ```lua
   local LightCoding = loadstring(game:HttpGet("https://raw.githubusercontent.com/AbobaLua/LightCoding/main/Source.lua"))()
   ```
  ### Functions
-  say(text) - print text example :
+  - Functions shorcut
   ```lua
-  LightCoding.say("hi")
+  local Functs = LightCoding.Functs
+  ```
+  - say(text) - print text:
+  ```lua
+  Functs.say("hi")
   -- Print hello to the console
   ```
   
-  warnmsg(text) - warn message example :
+  - warnmsg(text) - warn message:
   ```lua
-  LightCoding.warnmsg("Warning")
+  Functs.warnmsg("Warning")
   -- Print ⚠️ Warning to the console
   ```
   
-  err(text) - error message example : 
+  - err(text) - error message: 
   ```lua
-  LightCoding.err("Error")
+  Functs.err("Error")
   -- Print ❌ Error to the console
   ```
   
-  service(NameService) -- get service example :
+  - service(NameService) -- get service:
   ```lua
-  LightCoding.service("Players")
+  Functs.service("Players")
   -- get Players Service
   ```
   
-  create(NameClass) - Creates an object with the class name example :
+  - create(NameClass) - Creates an object with the class name:
   ```lua
-  LightCoding.create("Part") -- Creates Part
+  Functs.create("Part") -- Creates Part
   ```
   
-  pfireclickd(ClickDetecto) - Fire ClickDetector example :
+  - pfireclickd(ClickDetector) - Fire ClickDetector:
   ```lua
-  LightCoding.pfireclickd(workspace.ClickDetector)
-  -- fire click detector in workspace
+Functs.pfireclickd(workspace.ClickDetector)
+  -- fire clickdetector in workspace
   ```
   
-  pfiretouchinterest(plr or obj, obj) - Fire TouchInterest - need object BasePart Class example : 
+  - pfiretouchinterest(plr or obj, obj) - Fire TouchInterest - need object BasePart Class: 
   ```lua
-  LightCoding.pfiretouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Part)
+  Functs.pfiretouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Part)
   -- Fire TouchInterest in workspace.Part by using Player HumanoidRootPart
   ```
 
-  pfireproxpromt(ProximityPrompt) -- Fire Proximity Prompt
+  - pfireproxpromt(ProximityPrompt) -- Fire Proximity Prompt
   ```lua
-  LightCoding.pfireproxpromt(workspace.ProximityPrompt)
+  Functs.pfireproxpromt(workspace.ProximityPrompt)
   -- fire proximity prompt in workspace
   ```
 ### Rename function
-  How to rename function example : 
+  - How to rename function: 
   ```lua
-  local newClick = LightCoding.pfireclickd -- pfireclick - name function which you want to change
+  local newClick = LightCoding.Functs.pfireclickd -- pfireclick - name function which you want to change
   -- newClick - new function name
   newClick(workpace.ClickDetector)
   ```
