@@ -105,20 +105,20 @@ addfunc("pfireclickd", function(obj)
     if path:IsA("ClickDetector") then
       pcall(fireclickdetector, obj)
     end
-end
 end)
 -- firetouchinterest
 addfunc("pfiretouchinterest", function(touch, obj)
   if touch == plr or touch == char or touch == hrp then
-      if not hrp then return end
-        if obj:IsA("BasePart") then
-          pcall(firetouchinterest, hrp, obj, 0)
-        end
-        return
+    if not hrp then return end
+      if obj:IsA("BasePart") then
+        pcall(firetouchinterest, hrp, obj, 0)
+      end
+      return
     end
-    if obj:IsA("BasePart") then
-      pcall(firetouchinterest, touch, obj, 0)
-    end
+  end
+  if obj:IsA("BasePart") then
+    pcall(firetouchinterest, touch, obj, 0)
+  end
 end)
 -- fireproximitypromt
 addfunc("pfireproximitypromt", function(obj)
