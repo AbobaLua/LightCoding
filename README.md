@@ -9,58 +9,72 @@
  ### Functions
   - Functions shorcut
   ```lua
-  local Functs = LightCoding.Functs
+  local callfunc = LightCoding.CallFunc
+  ```
+  - Callfunc(NameFunction, arguments)
+  ```lua
+  LightCoding.CallFunc("say", "hello")
+  -- print hello to the console
   ```
   - say(text) - print text:
   ```lua
-  Functs.say("hi")
+  callfunc("say", "hi")
   -- Print hello to the console
   ```
   
   - warnmsg(text) - warn message:
   ```lua
-  Functs.warnmsg("Warning")
+  callfunc("warnmsg", "Warning")
   -- Print ⚠️ Warning to the console
   ```
   
   - err(text) - error message: 
   ```lua
-  Functs.err("Error")
+  callfunc("err", "Error")
   -- Print ❌ Error to the console
   ```
   
   - service(NameService) -- get service:
   ```lua
-  Functs.service("Players")
+  callfunc("service", "Players")
   -- get Players Service
   ```
   
   - create(NameClass) - Creates an object with the class name:
   ```lua
-  Functs.create("Part") -- Creates Part
+  callfunc("create", "Part") -- Creates Part
   ```
   
   - pfireclickd(ClickDetector) - Fire ClickDetector:
   ```lua
-Functs.pfireclickd(workspace.ClickDetector)
+callfunc("pfireclickd", workspace.ClickDetector)
   -- fire clickdetector in workspace
   ```
   
   - pfiretouchinterest(plr or obj, obj) - Fire TouchInterest - need object BasePart Class: 
   ```lua
-  Functs.pfiretouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Part)
-  -- Fire TouchInterest in workspace.Part by using Player HumanoidRootPart
+callfunc("pfiretouchinterest", game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Part)
+  -- Touch workspace.Part by using Player HumanoidRootPart
   ```
 
   - pfireproxpromt(ProximityPrompt) -- Fire Proximity Prompt
   ```lua
-  Functs.pfireproxpromt(workspace.ProximityPrompt)
+callfunc("pfireproxpromt", workspace.ProximityPrompt)
   -- fire proximity prompt in workspace
   ```
 ### Rename function
   - How to rename function: 
   ```lua
-  local newClick = LightCoding.Functs.pfireclickd -- pfireclick - name function which you want to change
+  local newClick = LightCoding.Functs.pfireclickd -- pfireclick - name function which you want to change, newClick new Name Functio
   -- newClick - new function name
   newClick(workpace.ClickDetector)
   ```
+  - Or
+  ```lua
+  local newClick = callfunc("pfireclickd")
+  newClick(workspace.ClickDetectoe)
+  ```
+### Delete Script
+```lua
+LightCoding:Delete()
+```
