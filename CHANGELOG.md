@@ -1,5 +1,23 @@
 # ChangeLog for Light Coding
 
+## [Unreleased]
+## Added
+- New Exploit Functions: BlockRE, UnBlockRE, getrawmetatable, getfenv, fireclickdetector, firetouchinterest, fireproximitypromtp, firesignal
+- New Function: AddCustomFunc
+- New Function: CallFunc
+- New Function: LightCoding:Delete()
+
+## Changed
+
+- Now you can LightCoding.Functs.getgenv.hi no longer LightCoding.Functs.getgenv().hi
+- No longer restart script with getgenv().LCDebug = true to enable Debug
+
+## Fixed
+
+- Fixed function err not working
+
+---
+
 ## [1.1 Version] - 2026-05-16
 ### Added
 
