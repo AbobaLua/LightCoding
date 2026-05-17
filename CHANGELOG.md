@@ -15,7 +15,7 @@
 ## Fixed
 
 - Fixed function err not working
-
+- Fixed when you tried declare a variable with CallFunc(NameFuction)
 ---
 
 ## [1.1 Version] - 2026-05-16
