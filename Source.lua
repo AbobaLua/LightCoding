@@ -75,11 +75,14 @@ local function CallFunc(name, ...)
   if not LightCoding then return end
   if Functs and CustomFuncts then
     local func = Functs[name] or CustomFuncts[name]
-    if func then
+    if not func then
+      console("Function: " .. tostring(name), "Not Found")
+      return nil
+    end
+    if select('#', ...) > 0 then
       return func(...)
     else
-      Console("Function: " .. tostring(name), "Not Found")
-      return nil
+      return func
     end
   end
 end
