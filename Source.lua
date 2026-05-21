@@ -47,7 +47,7 @@ local function missing(t, f, fallback)
 end
 local ClassFire = {RemoteEvent = "FireServer", RemoteFunction = "InvokeServer", UnreliableRemoteEvent = "FireServer", BindableRemote = "Fire", BindableFunction = "Invoke"}
 local ClassType = {RemoteEvent = true, RemoteFunction = true, UnreliableRemoteEvent = true, BindableRemote = true, BindableFunction = true}
-local function addfunc(name, func)
+local function AddFunc(name, func)
   if not name then return end
   if not (LightCoding and Functs) then return end
   if func and type(func) == "function" then
@@ -70,47 +70,60 @@ local function AddCustomFunc(name, func, debug, debugtext)
     end
   end
 end
-LightCoding.AddCustomFunc = AddCustomFunc
+LightCoding.AddCustomFunc = function(self, name, func, debug, debugtext)
+  AddCustomFunc(name, func, debug, debugtext)
+end
 local function CallFunc(name, ...)
   if not LightCoding then return end
   if Functs and CustomFuncts then
     local func = Functs[name] or CustomFuncts[name]
     if not func then
-      console("Function: " .. tostring(name), "Not Found")
+      error("Function: " .. tostring(name), "Not Found")
       return nil
     end
-    if select('#', ...) > 0 then
-      return func(...)
-    else
-      return func
-    end
+    return func(...)
   end
 end
-LightCoding.CallFunc = CallFunc
-addfunc("getgenv", missing("function", getgenv and getgenv()))
-addfunc("getfenv", missing("function", getfenv))
-addfunc("fireclickdetector", missing("function", fireclickdetector))
-addfunc("firetouchinterest", missing("function", firetouchinterest))
-addfunc("fireproximityprompt", missing("function", fireproximityprompt))
-addfunc("firesignal", missing("function", firesignal))
-addfunc("executor", missing("function", identifyexecutor or getexecutorname or (syn and syn.getexecutorname)))
-addfunc("clipboard", missing("function", setclipboard or toclipboard or set_clipboard or writeclipboard or (Clipboard and Clipboard.set)))
-addfunc("writefile", missing("function", writefile))
-addfunc("readfile", missing("function", readfile))
-addfunc("isfile", missing("function", isfile))
-addfunc("makefolder", missing("function", makefolder))
-addfunc("isfolder", missing("function", isfolder))
-addfunc("hookfunction", missing("function", hookfunction))
-addfunc("hookmetamethod", missing("function", hookmetamethod))
-addfunc("getnamecallmethod", missing("function", getnamecallmethod or get_namecall_method))
-addfunc("checkcaller", missing("function", checkcaller, function() return false end))
-addfunc("newcclosure", missing("function", newcclosure))
-addfunc("readonly", missing("function", readonly))
-addfunc("setreadonly", missing("function", setreadonly or make_readonly))
-addfunc("makewritable", missing("function", makewritable or make_writable))
-addfunc("isreadonly", missing("function", isreadonly or is_readonly))
-addfunc("getrawmetatable", missing("function", getrawmetatable))
-addfunc("getgc", missing("function", getgc or get_gc_objects))
+local function GetFunc(Name)
+  if not Name then return end
+  local Func = Functs[Name] or CustomFuncts[Name]
+  if Func then
+    return Func
+  else
+    error("Function: ", tostring(Name), "Not Found")
+  end
+end
+LightCoding.CallFunc = function(self, Name, ...)
+  CallFunc(Name, ...)
+end
+LightCoding.GetFunc = function(self, Name)
+  return GetFunc(Name)
+end
+AddFunc("getgenv", missing("function", (getgenv and getgenv())))
+AddFunc("getfenv", missing("function", (getfenv and getfenv())))
+AddFunc("getrenv", missing("function", (getrenv and getrenv())))
+AddFunc("fireclickdetector", missing("function", fireclickdetector))
+AddFunc("firetouchinterest", missing("function", firetouchinterest))
+AddFunc("fireproximityprompt", missing("function", fireproximityprompt))
+AddFunc("firesignal", missing("function", firesignal))
+AddFunc("executor", missing("function", identifyexecutor or getexecutorname or (syn and syn.getexecutorname)))
+AddFunc("clipboard", missing("function", setclipboard or toclipboard or set_clipboard or writeclipboard or (Clipboard and Clipboard.set)))
+AddFunc("writefile", missing("function", writefile))
+AddFunc("readfile", missing("function", readfile))
+AddFunc("isfile", missing("function", isfile))
+AddFunc("makefolder", missing("function", makefolder))
+AddFunc("isfolder", missing("function", isfolder))
+AddFunc("hookfunction", missing("function", hookfunction or detour_function))
+AddFunc("hookmetamethod", missing("function", hookmetamethod))
+AddFunc("getnamecallmethod", missing("function", getnamecallmethod or get_namecall_method))
+AddFunc("checkcaller", missing("function", checkcaller, function() return false end))
+AddFunc("newcclosure", missing("function", newcclosure))
+AddFunc("readonly", missing("function", readonly))
+AddFunc("setreadonly", missing("function", setreadonly or make_readonly))
+AddFunc("makewritable", missing("function", makewritable or make_writable))
+AddFunc("isreadonly", missing("function", isreadonly or is_readonly))
+AddFunc("getrawmetatable", missing("function", getrawmetatable))
+AddFunc("getgc", missing("function", getgc or get_gc_objects))
 -- Main Functions
 local function BlockRE(obj)
   if not ClassType[obj.ClassName] then return end
@@ -126,41 +139,37 @@ local function BlockRE(obj)
     end))
   end
 end
-addfunc("BlockRE", BlockRE)
+AddFunc("BlockRE", BlockRE)
 local function UnBlockRE(obj)
   if Settings.BlockedRemotes[obj] then
     Settings.BlockedRemotes[obj] = nil
   end
 end
-addfunc("UnBlockRE", UnBlockRE)
-addfunc("say", function(...)
+AddFunc("UnBlockRE", UnBlockRE)
+AddFunc("say", function(...)
   print(...)
 end)
 
-addfunc("warnmsg", function(...)
+AddFunc("warnmsg", function(...)
   warn(...)
 end)
 
-addfunc("err", function(text)
-  error("Error: " .. tostring(text))
-end)
-
-addfunc("service", function(Name)
+AddFunc("service", function(Name)
   return game:GetService(Name)
 end)
 -- create (Instance)
-addfunc("create", function(Name)
+AddFunc("create", function(Name)
   return Instance.new(Name)
 end)
 -- fireclickdetector
-addfunc("pfireclickd", function(obj)
+AddFunc("pfireclickd", function(obj)
     if not hrp then return end
     if obj:IsA("ClickDetector") then
       pcall(fireclickdetector, obj)
     end
 end)
 -- firetouchinterest
-addfunc("pfiretouchinterest", function(touch, obj)
+AddFunc("pfiretouchinterest", function(touch, obj)
   if touch == plr or touch == char or touch == hrp then
     if not hrp then return end
     if obj:IsA("BasePart") then
@@ -173,7 +182,7 @@ addfunc("pfiretouchinterest", function(touch, obj)
   end
 end)
 -- fireproximitypromt
-addfunc("pfireproximitypromt", function(obj)
+AddFunc("pfireproximitypromt", function(obj)
   if not hrp then return end
     if obj:IsA("ProximityPrompt") then
       pcall(fireproximityprompt, obj)
