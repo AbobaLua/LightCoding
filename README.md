@@ -4,7 +4,7 @@
   Make your coding easier!
   - Loadstring :
   ```lua
-  local LightCoding = loadstring(game:HttpGet("https://raw.githubusercontent.com/AbobaLua/LightCoding/main/Source.lua"))()
+  local LightCoding = loadstring(game:HttpGet("https://raw.githubusercontent.com/AbobaLua/LightCoding/Beta/Source.lua"))()
   ```
  ### Functions
   - Functions shorcut
