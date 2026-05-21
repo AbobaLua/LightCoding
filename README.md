@@ -63,6 +63,11 @@ CallFunc("pfireproxpromt", workspace.ProximityPrompt)
   -- newClick - new function name
   newClick(workpace.ClickDetector)
   ```
+### Custom Function
+  - How To Create Custom Function:
+  ```lua
+  LightCoding:AddCustomFunc("Hi", function() print("Hi") end, true, "Debug Working!") -- "Hi" Name Function, function() print("Hi") end - your function, true - debug enabled or not(true, false), "Debug Working!" - debug output Text
+  ```
 ### Delete Script
 ```lua
 LightCoding:Delete()
