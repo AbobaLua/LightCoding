@@ -3,19 +3,20 @@
 ## [Unreleased]
 ## Added
 - New Exploit Functions: BlockRE, UnBlockRE, getrawmetatable, getfenv, fireclickdetector, firetouchinterest, fireproximitypromtp, firesignal
-- New Function: AddCustomFunc
-- New Function: CallFunc
+- New Function: LightCoding:AddCustomFunc()
+- New Function: LightCoding:CallFunc()
 - New Function: LightCoding:Delete()
+- New Function: LightCoding:GetFunc()
 
 ## Changed
 
-- Now you can LightCoding.Functs.getgenv.hi no longer LightCoding.Functs.getgenv().hi
+- Now you can LightCoding:CallFunc("getgenv", "hi") no longer LightCoding.Functs.getgenv.hi
 - No longer restart script with getgenv().LCDebug = true to enable Debug
 
-## Fixed
+## Removed
 
-- Fixed function err not working
-- Fixed when you tried declare a variable with CallFunc(NameFuction)
+ - Remove err function
+
 ---
 
 ## [1.1 Version] - 2026-05-16
