@@ -7,6 +7,7 @@
 - New Function: LightCoding:CallFunc()
 - New Function: LightCoding:Delete()
 - New Function: LightCoding:GetFunc()
+- New Variable: LightCoding.Settings.Loaded or getgenv().LCLoaded or _G.LCLoaded
 
 ## Changed
 
