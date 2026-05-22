@@ -1,3 +1,5 @@
+local env = (type(getgenv) == "function" and getgenv()) or _G
+if env.LCLoaded then return end
 local plr = game.Players.LocalPlayer
 local char = plr.Character or plr.CharacterAdded:Wait()
 local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -17,6 +19,7 @@ LightCoding.Info = {
   Description = "Simple Coding Library"
 }
 LightCoding.Settings = {
+  Loaded = false,
   Debug = false,
   IsStudio = false,
   BlockedRemotes = { }
@@ -211,4 +214,6 @@ if getgenv then
   print("--Repository: " .. LightCoding.Info.Repository)
   print("--Description: " .. LightCoding.Info.Description)
 end
+Settings.Loaded = true
+env.LCLoaded = true
 return LightCoding
