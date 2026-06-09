@@ -2,65 +2,127 @@
 ---
 ## Light Coding
   Make your coding easier!
-  - Loadstring :
+  ### Loadstring
   ```lua
   local LightCoding = loadstring(game:HttpGet("https://raw.githubusercontent.com/AbobaLua/LightCoding/main/Source.lua"))()
   ```
- ### Functions
-  - Functions shorcut
+
+---
+
+### Functions
+  #### say() - print text
   ```lua
-  local Functs = LightCoding.Functs
-  ```
-  - say(text) - print text:
-  ```lua
-  Functs.say("hi")
+  LightCoding:CallFunc("say", "hi")
   -- Print hello to the console
   ```
   
-  - warnmsg(text) - warn message:
+   Or
+  
   ```lua
-  Functs.warnmsg("Warning")
+  LightCoding.Functs.say("hi")
+  ```
+  #### warnmsg() - warn message
+  ```lua
+  LightCoding:CallFunc("warnmsg", "Warning")
   -- Print ⚠️ Warning to the console
   ```
   
-  - err(text) - error message: 
+  #### service() -- get service
   ```lua
-  Functs.err("Error")
-  -- Print ❌ Error to the console
+  LightCoding:CallFunc("service", "Players")
+  -- Get Players Service
   ```
   
-  - service(NameService) -- get service:
+  #### create() - Creates an object with the class name
   ```lua
-  Functs.service("Players")
-  -- get Players Service
+  LightCoding:CallFunc("create", "Part")
+  -- Create Part
   ```
   
-  - create(NameClass) - Creates an object with the class name:
+  #### pfireclickd() - Fire ClickDetector
   ```lua
-  Functs.create("Part") -- Creates Part
+  LightCoding:CallFunc("pfireclickd", workspace.ClickDetector)
+  -- Fire clickdetector in workspace
   ```
   
-  - pfireclickd(ClickDetector) - Fire ClickDetector:
+  #### pfiretouchinterest() - Fire TouchInterest - need object BasePart Class
   ```lua
-Functs.pfireclickd(workspace.ClickDetector)
-  -- fire clickdetector in workspace
-  ```
-  
-  - pfiretouchinterest(plr or obj, obj) - Fire TouchInterest - need object BasePart Class: 
-  ```lua
-  Functs.pfiretouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Part)
-  -- Fire TouchInterest in workspace.Part by using Player HumanoidRootPart
+  LightCoding:CallFunc("pfiretouchinterest", game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Part)
+  -- Touch workspace.Part by using Player HumanoidRootPart
   ```
 
-  - pfireproxpromt(ProximityPrompt) -- Fire Proximity Prompt
+  #### pfireproxpromt() - Fire Proximity Prompt
   ```lua
-  Functs.pfireproxpromt(workspace.ProximityPrompt)
+  LightCoding:CallFunc("pfireproxpromt", workspace.ProximityPrompt)
   -- fire proximity prompt in workspace
   ```
-### Rename function
-  - How to rename function: 
+  #### BlockRE() - Block Remote Event or Remote Function or UnreliableRemoteEvent or BindableRemote or BindableFunction
   ```lua
-  local newClick = LightCoding.Functs.pfireclickd -- pfireclick - name function which you want to change
-  -- newClick - new function name
+  LightCoding:CallFunc("BlockRE", game.workspace.RemoteEvent)
+  ```
+  #### UnBlockRE() - UnBlock Remote Event or Remote Function or UnreliableRemoteEvent or BindableRemote or BindableFunction if it was blocked
+  ```lua
+  LightCoding:CallFunc("UnBlockRE", game.workspace.RemoteEvent)
+  ```
+  
+---
+
+### Get function
+  #### How to get a link to the function
+  ```lua
+  local newClick = LightCoding:GetFunc("pfireclickd")
   newClick(workpace.ClickDetector)
+  -- pfireclick - Name function which you want to remame
+  -- newClick - Link to the function
+  ```
+
+---
+
+### Methods
+  #### ClearLog() - Clear Log
+  ```lua
+  LightCoding:ClearLog()
+  ```
+
+---
+
+### Custom things
+  #### How To Create Custom Function, AddCustomFunc()
+  Example of create custom function
+  ```lua
+  LightCoding:AddCustomFunc("Hi", function() print("Hi") end, true, "Debug Working!")
+  -- "Hi" Name Function
+  -- function() print("Hi") end - Your function
+  -- true - Debug enabled or not (true or false)
+  -- "Debug Working!" - Debug output Text
+  ```
+  #### How To Create Custom Method, AddCustomMethod()
+  ##### What is a method?
+   This is when you use : instead of . in this library example
+    ```lua
+      LightCoding:AddCustomFunc()
+    ```
+  Example of create custom method
+  ```lua
+  LightCoding:AddCustomMethod("Hello", false, function()
+    print("Hello")
+  end)
+  LightCoding:Hello()
+  -- "Hello" - Name Method
+  -- false - Will it transmit self (true or false)
+  -- function() - Your custom function
+  ```
+  Other Example
+  ```lua
+  LightCoding:AddCustomMethod("SayName", true, function(self)
+    print(self.Info.Name)
+  end)
+  LightCoding:SayName()
+  ```
+
+---
+
+### Delete Script
+  ```lua
+  LightCoding:Delete()
   ```
