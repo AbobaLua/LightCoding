@@ -98,7 +98,7 @@
   ```
   #### How To Create Custom Method, AddCustomMethod()
   ##### What is a method?
-    This is when you use : instead of . in this library example
+   This is when you use : instead of . in this library example
     ```lua
       LightCoding:AddCustomFunc()
     ```
