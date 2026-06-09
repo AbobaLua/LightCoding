@@ -1,12 +1,15 @@
 # ChangeLog for Light Coding
 
-## [Unreleased]
+## [1.2 Version] - 2026-06-09
 ## Added
-- New Exploit Functions: BlockRE, UnBlockRE, getrawmetatable, getfenv, fireclickdetector, firetouchinterest, fireproximitypromtp, firesignal
-- New Function: LightCoding:AddCustomFunc()
-- New Function: LightCoding:CallFunc()
-- New Function: LightCoding:Delete()
-- New Function: LightCoding:GetFunc()
+- Log Added
+- New Exploit Functions: BlockRE, UnBlockRE, getrawmetatable, getfenv, fireclickdetector, firetouchinterest, fireproximitypromtp, firesignal, setfflag, getfflag, gethwid, clonoref, replicatesignal, gethiddenproperty, sethiddenproperty, gethui
+- New Method: LightCoding:AddCustomFunc()
+- New Method: LightCoding:AddCustomMethod()
+- New Method: LightCoding:ClearLog()
+- New Method: LightCoding:CallFunc()
+- New Method: LightCoding:Delete()
+- New Method: LightCoding:GetFunc()
 - New Variable: LightCoding.Settings.Loaded or getgenv().LCLoaded or _G.LCLoaded
 
 ## Changed
@@ -24,7 +27,6 @@
 ### Added
 
 - New Exploit Functions: getgenv, executor, clipboard, writefile, readfile, isfile, makefolder, isfolder, hookfunction, hookmetamethod, getnamecallmethod, checkaller, newcclosure, readonly, setreadonly, makewriteable, isreadonly, getgc
-- New Debug Function: console
 - Added Debug
 - New Sections Info, Settings
 - Added new Automatic Debug
@@ -43,3 +45,4 @@
 - First publication of the repository
 - Basic Functions: say, warnmsg, err, service, create
 - Exploit Functions: pfireclickd, pfiretouchinterest, pfireproximitypromt
+- 
