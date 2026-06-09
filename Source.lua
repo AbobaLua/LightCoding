@@ -11,7 +11,7 @@ plr.CharacterAdded:Connect(function(character)
 local LightCoding = {}
 LightCoding.Info = {
   Name = "Light coding",
-  Version = "Unreleased",
+  Version = "1.2 Version",
   Author = {
     Name = "AbobaLua",
     URL = "https://github.com/AbobaLua"
