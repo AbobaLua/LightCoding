@@ -3,6 +3,7 @@
 ## [1.21 Beta] - Unrelated
 
 ## Added
+
 - New Methods to LightCoding:
 - New Method IsLoaded()
 - New Method WaitForLoad()
@@ -11,10 +12,15 @@
 - New Function UnHookRE()
 - New Function HookMethod()
 - New Function UnHookMethod()
+
+## Changed
+
+- Now functions getgenv, getfenv, getrenv return function not table
 ---
 
 ## [1.2 Version] - 2026-06-09
 ## Added
+
 - Log Added
 - New Exploit Functions: BlockRE, UnBlockRE, getrawmetatable, getfenv, fireclickdetector, firetouchinterest, fireproximitypromtp, firesignal, setfflag, getfflag, gethwid, clonoref, replicatesignal, gethiddenproperty, sethiddenproperty, gethui
 - New Method: LightCoding:AddCustomFunc()
