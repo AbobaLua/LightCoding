@@ -1,5 +1,18 @@
 # ChangeLog for Light Coding
 
+## [1.21 Beta] - Unrelated
+
+## Added
+- New Methods to LightCoding:
+- New Method IsLoaded()
+- New Method WaitForLoad()
+- New Exploit Functions:
+- New Function HookRE()
+- New Function UnHookRE()
+- New Function HookMethod()
+- New Function UnHookMethod()
+---
+
 ## [1.2 Version] - 2026-06-09
 ## Added
 - Log Added
@@ -45,4 +58,3 @@
 - First publication of the repository
 - Basic Functions: say, warnmsg, err, service, create
 - Exploit Functions: pfireclickd, pfiretouchinterest, pfireproximitypromt
-- 
