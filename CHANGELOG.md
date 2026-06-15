@@ -1,26 +1,38 @@
 # ChangeLog for Light Coding
 
-## [1.21 Beta] - Unrelated
+## [1.21 Beta] - Unreleased
 
-## Added
-
+### Added
 - New Methods to LightCoding:
 - New Method IsLoaded()
 - New Method WaitForLoad()
+- New Method LoadModule()
+
+- Added Modules
+- New Modules:
+- New Module Extra
+- New Module Extra Functions
+
 - New Exploit Functions:
 - New Function HookRE()
 - New Function UnHookRE()
+
 - New Function HookMethod()
-- New Function UnHookMethod()
+- New Function UnHookMethod
 
-## Changed
+- New Function HookFunction()
+- New Function UnHookFunction()
 
-- Now functions getgenv, getfenv, getrenv return function not table
+- New Function HookIndex()
+- New Function UnHookIndex()
+
+- New Function HookNewIndex()
+- New Function UnHookIndex()
+
 ---
 
 ## [1.2 Version] - 2026-06-09
-## Added
-
+### Added
 - Log Added
 - New Exploit Functions: BlockRE, UnBlockRE, getrawmetatable, getfenv, fireclickdetector, firetouchinterest, fireproximitypromtp, firesignal, setfflag, getfflag, gethwid, clonoref, replicatesignal, gethiddenproperty, sethiddenproperty, gethui
 - New Method: LightCoding:AddCustomFunc()
@@ -31,12 +43,12 @@
 - New Method: LightCoding:GetFunc()
 - New Variable: LightCoding.Settings.Loaded or getgenv().LCLoaded or _G.LCLoaded
 
-## Changed
+### Changed
 
 - Now you can LightCoding:CallFunc("getgenv", "hi") no longer LightCoding.Functs.getgenv.hi
 - No longer restart script with getgenv().LCDebug = true to enable Debug
 
-## Removed
+### Removed
 
  - Remove err function
 
@@ -58,9 +70,10 @@
 
 ---
 
-##   [1.0 Version] - 2026-05-10
+## [1.0 Version] - 2026-05-10
 
 ### Added
 - First publication of the repository
 - Basic Functions: say, warnmsg, err, service, create
 - Exploit Functions: pfireclickd, pfiretouchinterest, pfireproximitypromt
+- 
