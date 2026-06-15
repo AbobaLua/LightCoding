@@ -1,10 +1,13 @@
 local env = (type(getgenv) == "function" and getgenv()) or _G
 if not game:IsLoaded() then game.Loaded:Wait() end
 if env.LCLoaded then return "Light Coding Already Loaded!" end
+local startTime = os.clock()
 local function missing(t, f, fallback)
   if type(f) == t then return f end
   return fallback
 end
+local ModulFolder = "https://raw.githubusercontent.com/AbobaLua/LightCoding/Beta/Modules/"
+local luaprefix = ".lua"
 local LightCoding = {
   Info = {
     Name = "Light coding",
@@ -20,7 +23,7 @@ local LightCoding = {
     Loaded = false,
     Debug = false,
     IsStudio = false,
-    SetupRemotes = {
+    Setup = {
       Hooks = {
         GlobalHookActivated = false,
         BlockRemoteInstall = false,
@@ -29,14 +32,24 @@ local LightCoding = {
       },
       RemoteList = {
         BlockedRemotes = {},
-        HookedRemotes = {},
-        HookedSpecial = {}
+        HookedRemotes = {}
+      },
+      HooksSpecial = {
+        HookedSpecial = {},
+        HookedFunctions = {},
+        HookedPropertyRead = {},
+        HookedPropertyWrite = {}
       }
+    },
+    Modules = {
+      LoadedModules = {},
+      ["Extra"] = ModulFolder .. "Extra" .. luaprefix,
+      ["Extra Functions"] = ModulFolder .. "Extra-Exploit-Functios" .. luaprefix
     }
   },
   Functs = {},
   CustomFuncts = {},
-  Log = {}
+  Log = {},
 }
 -- For Work Stuff
 local safeget = missing("function", cloneref, function(...) return ... end)
@@ -64,11 +77,15 @@ plr.CharacterAdded:Connect(function(character)
 end)
 local Info = LightCoding.Info
 local Settings = LightCoding.Settings
-local SetupRemotes = Settings.SetupRemotes
-local Hookses = SetupRemotes.Hooks
-local BlockedRemotes = SetupRemotes.RemoteList.BlockedRemotes
-local HookedRemotes = SetupRemotes.RemoteList.HookedRemotes
-local HookedSpecial = SetupRemotes.RemoteList.HookedSpecial
+local Setup = Settings.Setup
+local Hookses = Setup.Hooks
+local BlockedRemotes = Setup.RemoteList.BlockedRemotes
+local HookedRemotes = Setup.RemoteList.HookedRemotes
+local HooksSpecial = Setup.HooksSpecial
+local HookedSpecial = HooksSpecial.HookedSpecial
+local HookedFunctions = HooksSpecial.HookedFunctions
+local HookedPropertyRead = HookedSpecial.HookedPropertyRead
+local HookedPropertyWrite = HookedSpecial.HookedPropertyWrite
 local Functs = LightCoding.Functs
 local CustomFuncts = LightCoding.CustomFuncts
 local Log = LightCoding.Log
@@ -100,6 +117,8 @@ local function Initialization()
     Settings.Loaded = true
   end
   env.LCLoaded = true
+  local loadTime = (os.clock() - startTime) * 1000  -- в миллисекундах
+  print(string.format("Loaded in %.2f ms", loadTime))
 end
 local function console(...)
   if Settings and Settings.Debug then
@@ -247,16 +266,11 @@ local function GetFunc(Name)
     error("Function: ", tostring(Name), "Not Found")
   end
 end
+local ModuleAPI = {
+  AddFunc = AddFunc,
+  missing = missing
+}
 -- Methods
-AddMethod("Delete", true, function(self)
-  if self == LightCoding then
-    for k in pairs(self) do
-      self[k] = nil
-    end
-    setmetatable(self, nil)
-    print("Bye LightCoding")
-  end
-end)
 AddMethod("IsLoaded", true, function(self)
   return self.Settings.Loaded
 end)
@@ -266,50 +280,38 @@ AddMethod("WaitForLoad", true, function(self)
   end
   return true
 end)
+AddMethod("Delete", true, function(self)
+  for k in pairs(self) do
+    self[k] = nil
+  end
+  env.LCLoaded = false
+  setmetatable(self, nil)
+  print("Bye LightCoding")
+end)
 AddMethod("ClearLog", true, function(self)
   for i, v in pairs(self.Log) do
     self.Log[i] = nil
   end
 end)
+AddMethod("LoadModule", true, function(self, name)
+  if not name or name == "LoadedModules" then return end
+  local modulelink = self.Settings.Modules[name]
+  if not modulelink then return end
+  local cache = self.Settings.Modules.LoadedModules
+  if cache[name] then return cache[name] end
+  local success, result = pcall(function()
+    local code = game:HttpGet(modulelink)
+    local modulefunc = loadstring(code)
+    return modulefunc(self, ModuleAPI)
+  end)
+  if not success then warn("Failed to load module :" .. name) return end
+  cache[name] = result
+  return result
+end)
 AddMethod("AddCustomMethod", false, AddCustomMethod)
 AddMethod("AddCustomFunc", false, AddCustomFunc)
 AddMethod("CallFunc", false, CallFunc)
 AddMethod("GetFunc", false, GetFunc)
--- Others exploit functions
-AddFunc("getgenv", missing("function", getgenv))
-AddFunc("getfenv", missing("function", getfenv))
-AddFunc("getrenv", missing("function", getrenv))
-AddFunc("getfflag", missing("function", getfflag))
-AddFunc("setfflag", missing("function", setfflag))
-AddFunc("gethwid", missing("function", gethwid))
-AddFunc("cloneref", missing("function", cloneref, function(...) return ... end))
-AddFunc("getconnections", missing("function", getconnections))
-AddFunc("fireclickdetector", missing("function", fireclickdetector))
-AddFunc("firetouchinterest", missing("function", firetouchinterest))
-AddFunc("fireproximityprompt", missing("function", fireproximityprompt))
-AddFunc("firesignal", missing("function", firesignal))
-AddFunc("replicatesignal", missing("function", replicatesignal))
-AddFunc("executor", missing("function", identifyexecutor or getexecutorname or (syn and syn.getexecutorname)))
-AddFunc("clipboard", missing("function", setclipboard or toclipboard or set_clipboard or writeclipboard or (Clipboard and Clipboard.set)))
-AddFunc("writefile", missing("function", writefile))
-AddFunc("readfile", missing("function", readfile))
-AddFunc("isfile", missing("function", isfile))
-AddFunc("makefolder", missing("function", makefolder))
-AddFunc("isfolder", missing("function", isfolder))
-AddFunc("hookfunction", missing("function", hookfunction or detour_function or hook_func))
-AddFunc("hookmetamethod", missing("function", hookmetamethod))
-AddFunc("getnamecallmethod", missing("function", getnamecallmethod or get_namecall_method))
-AddFunc("checkcaller", missing("function", checkcaller, function() return false end))
-AddFunc("newcclosure", missing("function", newcclosure))
-AddFunc("readonly", missing("function", readonly))
-AddFunc("setreadonly", missing("function", setreadonly or make_readonly))
-AddFunc("makewritable", missing("function", makewritable or make_writable))
-AddFunc("isreadonly", missing("function", isreadonly or is_readonly))
-AddFunc("getrawmetatable", missing("function", getrawmetatable))
-AddFunc("getgc", missing("function", getgc or get_gc_objects))
-AddFunc("gethui", missing("function", gethui or get_hidden_gui))
-AddFunc("gethiddenproperty", missing("function", gethiddenproperty or get_hidden_property))
-AddFunc("sethiddenproperty", missing("function", sethiddenproperty or set_hidden_property))
 -- Main Functions
 local function ControlHooks()
   Hookses.BlockRemoteInstall = next(BlockedRemotes) ~= nil
@@ -318,6 +320,7 @@ local function ControlHooks()
 end
 local function SetupRemotes()
   if Hookses.GlobalHookActivated then return end
+  Hookses.GlobalHookActivated = true
   local old;
   old = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     local method = getnamecallmethod()
@@ -368,6 +371,7 @@ local function UnBlockRE(remote)
     ControlHooks()
   end
 end
+-- Hooks
 local function HookRE(remote, callback)
   if not remote then return end
   if type(callback) ~= "function" then return end
@@ -413,37 +417,119 @@ local function UnHookMethod(obj, method)
     HookedSpecial[obj] = nil
   end
 end
+local function HookFunction(targetfunc, newfunc)
+  if not targetfunc or type(targetfunc) ~= "function" or not newfunc or type(newfunc) ~= "function" then return end
+  if HookedFunctions[targetfunc] then
+    return "Function Already Hooked!"
+  end
+  local original = targetfunc
+  local success, hooked = pcall(hookfunction, targetfunc, newcclosure(newfunc))
+  if not success then console("hookfunction Failed") return end
+  HookedFunctions[targetfunc] = original
+  return original
+end
+local function UnHookFunction(func)
+  if not func or not HookedFunctions[func] then return end
+  local original = HookedFunctions[func]
+  local success = pcall(hookfunction, func, original)
+  if not success then console("Failed to UnHook") return end
+  HookedFunctions[func] = nil
+end
+local function HookPropertyRead(obj, callback)
+  if not obj or type(callback) ~= "function" then return end
+  if HookedPropertyRead[obj] then return "Property read already hooked on this object" end
+  local mt = getrawmetatable(obj)
+  if not mt then return "Metatable not found for object" end
+  local original = mt.__index
+  local hooked = newcclosure(function(self, key)
+    local result = callback(self, key, original)
+    if result ~= nil then return result end
+    if original then
+      if type(original) == "function" then
+        return original(self, key)
+      else
+        return original[key]
+      end
+    end
+    return nil
+  end)
+  mt.__index = hooked
+  HookedPropertyRead[obj] = {original = original, hooked = hooked}
+end
+local function UnHookPropertyRead(obj)
+  if not obj then return end
+  local data = HookedPropertyRead[obj]
+  if not data then return end
+  local mt = getrawmetatable(obj)
+  if mt then
+    mt.__index = data.original
+  end
+  HookedPropertyRead[obj] = nil
+end
+local function HookPropertyWrite(obj, callback)
+  if not obj or type(callback) ~= "function" then return end
+  if HookedPropertyWrite[obj] then return "Property write already hooked on this object" end
+  local mt = getrawmetatable(obj)
+  if not mt then return "Metatable not found for object" end
+  local original = mt.__newindex
+  local hooked = newcclosure(function(self, key, value)
+    local newValue = callback(self, key, value, original)
+    if newValue == nil then return end
+      if original then
+        if type(original) == "function" then
+          original(self, key, newValue)
+        else
+          original[key] = newValue
+        end
+      else
+        rawset(self, key, newValue)
+      end
+  end)
+  mt.__newindex = hooked
+  HookedPropertyWrite[obj] = { original = original, hooked = hooked }
+end
+local function UnHookPropertyWrite(obj)
+  if not obj then return end
+  local data = HookedPropertyWrite[obj]
+  if not data then return end
+  local mt = getrawmetatable(obj)
+  if mt then
+    mt.__newindex = data.original
+  end
+  HookedPropertyWrite[obj] = nil
+end
 AddFunc("BlockRE", BlockRE)
 AddFunc("UnBlockRE", UnBlockRE)
 AddFunc("HookRE", HookRE)
 AddFunc("UnHookRE", UnHookRE)
 AddFunc("HookMethod", HookMethod)
 AddFunc("UnHookMethod", UnHookMethod)
+AddFunc("HookFunction", HookFunction)
+AddFunc("UnHookFunction", UnHookFunction)
+AddFunc("HookIndex", HookPropertyRead)
+AddFunc("UnHookIndex", UnHookPropertyRead)
+AddFunc("HookNewIndex", HookPropertyWrite)
+AddFunc("UnHookNewIndex", UnHookPropertyWrite)
 AddFunc("say", function(...)
   print(...)
 end)
-
 AddFunc("warnmsg", function(...)
   warn(...)
 end)
-
 AddFunc("service", function(Name)
   if not Name then return end
   return game:GetService(Name)
 end)
--- create (Instance)
 AddFunc("create", function(Name)
   if not Name then return end
   return Instance.new(Name)
 end)
--- fireclickdetector
 AddFunc("pfireclickd", function(obj)
   if not obj or not hrp then return end
   if obj:IsA("ClickDetector") then
     pcall(fireclickdetector, obj)
   end
 end)
--- firetouchinterest
 AddFunc("pfiretouchinterest", function(touch, obj)
   if not obj or not touch then return end
   if touch == plr or touch == char or touch == hrp then
@@ -457,7 +543,6 @@ AddFunc("pfiretouchinterest", function(touch, obj)
     pcall(firetouchinterest, touch, obj, 0)
   end
 end)
--- fireproximitypromt
 AddFunc("pfireproximitypromt", function(obj)
   if not hrp or not obj then return end
   if obj:IsA("ProximityPrompt") then
