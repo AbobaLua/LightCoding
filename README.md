@@ -17,6 +17,13 @@
   ```lua
   LightCoding:CallFunc("say", "Hello")
   ```
+  #### GetFunc() - Get Function
+   Arguments - 1
+   First Argument - Func for the get (required)
+  ```lua
+  local newsay = LightCoding:GetFunc("say")
+  newsay("Hello")
+  ```
   #### IsLoaded() - Loading check
    Arguments - 0 (None)
    Returns the loaded status of LightCoding (true/false)
@@ -29,12 +36,12 @@
    ```lua
    LightCoding:WaitForLoad()
    ```
-  #### GetFunc() - Get Function
+  #### LoadModule() - Load Module
    Arguments - 1
-   First Argument - Func for the get (required)
+   First argument - name of Module
+   Modules: Extra, Extra Functions
   ```lua
-  local newsay = LightCoding:GetFunc("say")
-  newsay("Hello")
+  LightCoding:LoadModule("Extra")
   ```
   #### ClearLog() - Clear Log
    Arguments - 0 (None)
@@ -186,23 +193,86 @@
   #### Note: HookMethod can hook multiple methods on an object
   #### UnHookMethod() - UnHook object method
    Arguments - 2
-   First argument - object for UnHook
-   Second argument - method for unhook
+   First argument - object for UnHook (required)
+   Second argument - method for unhook (optional)
   ```lua
   LightCoding:CallFunc("UnHookMethod", game.workspace.Part, "Destroy")
   ```
   #### Note: A remote cannot be hooked and blocked at the same time
   If you try to hook a blocked remote, it will return warning line
-  
+  #### HookFunction() - Hook Function
+   Arguments - 2
+   First argument - function for Hook (required)
+   Second argument - new function (required)
+   Note: if you call HookFunction it return original function
+  ```lua
+  local oldprint = LightCoding:CallFunc("HookFunction", print, function(...)
+    print("Hoked with args: ", ...)
+    oldprint(...)
+  end)
+  ```
+  #### UnHookFunction() - UnHook Function
+  Arguments - 1
+  First argument - function for unhook (required)
+  ```lua
+  LightCoding:CallFunc("UnHookFunction", print)
+  ```
+  #### HookIndex() - Hook Index - intercept property reads
+  Arguments - 2 (+3)
+  First argument - object index for hook (required)
+  Second argument - new function (required)
+  First function argument - object
+  Second function argument - property(key)
+  Third function argument - original object index
+  Warning:
+   If you don't return any arguments, the call will block
+  ```lua
+  LightCoding:CallFunc("HookIndex", game.workspace.Part, function(self, key, original)
+    if key == "Name" then
+      return "Hooked"
+    end
+    return original(self, key)
+  end)
+  ```
+  #### UnHookIndex() - UnHook Index
+  Arguments - 1
+  First argument - object index for unhook (required)
+  ```lua
+  LightCoding:CallFunc("UnHookIndex", game.workspace.Part)
+  ```
+  #### HookNewIndex() - Hook NewIndex - intercept property write
+  Arguments - 2 (+4)
+  First argument - object newindex for hook (required)
+  Second argument - new function (required)
+  First function argument - object
+  Second function argument - property(key)
+  Third function argument - value for property
+  Fourth function argument - original object newindex
+  Warning:
+   If you don't return any arguments, the call will block
+  ```lua
+  LightCoding:CallFunc("HookNewIndex", game.workspace.Part, function(self, key, value, original)
+    if key == "Position" then
+      return Vector3.new(10, 50, 10)
+    end
+    original(self, key, value)
+  end)
+  ```
+  #### UnHookNewIndex() - UnHook NewIndex
+  Arguments - 1
+  First argument - object newindex for unhook (required)
+  ```lua
+  LightCoding:CallFunc("UnHookNewIndex", game.workspace.Part)
+  ```
 ---
 
 ### Custom things
   #### How To Create Custom Function, AddCustomFunc()
-   Arguments - 4
-   First argument - name for custom function (required)
-   Second argument - custom function (required)
-   Third argument - debug enabled or not (true/false) (optional)
-   Fourth argument - debugger text (optional)
+  Arguments - 4
+  First argument - name for custom function (required)
+  Second argument - custom function (required)
+  Third argument - debug enabled or not (true/false) (optional)
+  Fourth argument - debugger text (optional)
   Example of create custom function
   ```lua
   LightCoding:AddCustomFunc("Hi", function()
