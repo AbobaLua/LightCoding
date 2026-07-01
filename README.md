@@ -1,5 +1,4 @@
 ## Work in Progress(WIP)
-## The project is frozen for a week 📅 (I'll be back in 01.07)
 ---
 ## Light Coding
   Make your coding easier!
