@@ -1,6 +1,6 @@
 # ChangeLog for Light Coding
 
-## [1.21 Beta] - Unreleased
+## [1.22 Beta] - Unreleased
 
 ### Added
 - New Methods to LightCoding:
