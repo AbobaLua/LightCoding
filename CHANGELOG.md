@@ -12,8 +12,12 @@
 - New Modules:
 - New Module Extra
 - New Module Extra Functions
+- New Module Net
+- New Module Player
+- New Module ESP
+- New Module GUI
 
-- New Exploit Functions:
+- New Net Module Functions:
 - New Function HookRE()
 - New Function UnHookRE()
 
@@ -28,6 +32,10 @@
 
 - New Function HookNewIndex()
 - New Function UnHookIndex()
+
+### Changed
+
+- Added to AddCustomFunc - Aliases
 
 ---
 
