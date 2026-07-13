@@ -8,10 +8,13 @@ local function missing(t, f, fallback)
 end
 local ModulFolder = "https://raw.githubusercontent.com/AbobaLua/LightCoding/Beta/Modules/"
 local luaprefix = ".lua"
+form = function(txt)
+  return (ModulFolder .. txt .. luaprefix)
+end
 local LightCoding = {
   Info = {
     Name = "Light coding",
-    Version = "1.21 Beta",
+    Version = "1.22 Beta",
     Author = {
       Name = "AbobaLua",
       URL = "https://github.com/AbobaLua"
@@ -23,28 +26,18 @@ local LightCoding = {
     Loaded = false,
     Debug = false,
     IsStudio = false,
-    Setup = {
-      Hooks = {
-        GlobalHookActivated = false,
-        BlockRemoteInstall = false,
-        HookRemoteInstall = false,
-        SpeficHookInstall = false
-      },
-      RemoteList = {
-        BlockedRemotes = {},
-        HookedRemotes = {}
-      },
-      HooksSpecial = {
-        HookedSpecial = {},
-        HookedFunctions = {},
-        HookedPropertyRead = {},
-        HookedPropertyWrite = {}
-      }
+    AliasMap = {},
+    Events = {
+      Listeners = {}
     },
     Modules = {
       LoadedModules = {},
-      ["Extra"] = ModulFolder .. "Extra" .. luaprefix,
-      ["Extra Functions"] = ModulFolder .. "Extra-Exploit-Functios" .. luaprefix
+      ["Extra"] = form("Extra"),
+      ["Extra Functions"] = form("Extra-Exploit-Functios"),
+      ["Net"] = form("Net"),
+      ["Player"] = form("Player"),
+      ["ESP"] = form("Esp"),
+      ["GUI"] = form("Gui")
     }
   },
   Functs = {},
@@ -77,15 +70,7 @@ plr.CharacterAdded:Connect(function(character)
 end)
 local Info = LightCoding.Info
 local Settings = LightCoding.Settings
-local Setup = Settings.Setup
-local Hookses = Setup.Hooks
-local BlockedRemotes = Setup.RemoteList.BlockedRemotes
-local HookedRemotes = Setup.RemoteList.HookedRemotes
-local HooksSpecial = Setup.HooksSpecial
-local HookedSpecial = HooksSpecial.HookedSpecial
-local HookedFunctions = HooksSpecial.HookedFunctions
-local HookedPropertyRead = HookedSpecial.HookedPropertyRead
-local HookedPropertyWrite = HookedSpecial.HookedPropertyWrite
+local AliasMap = Settings.AliasMap
 local Functs = LightCoding.Functs
 local CustomFuncts = LightCoding.CustomFuncts
 local Log = LightCoding.Log
@@ -140,27 +125,33 @@ local function OutputLog(call, typelog, config)
           args[i] = info.nameparams[i] or "arg"..i
         end
       else
-    for i = 1, info.nparams do
-      args[i] = "arg"..i
+        for i = 1, info.nparams do
+          args[i] = "arg"..i
+        end
+      end
+    else
+      if info.is_vararg or info.isvararg then
+        args = {"..."}
+      else 
+        args = {}
+      end
     end
-  end
-else
-  args = {"..."}
-end
-  Log[call .. typelog .. LogAmmount] = {
-    Name = config[1],
-    Function = config[2],
-    Args = args,
-    IsCustom = config[3],
-    CreateTime = os.date("%H:%M:%S")
-  }
-  LogAmmount = LogAmmount + 1
+    Log[call .. typelog .. LogAmmount] = {
+      Name = config[1],
+      Function = config[2],
+      Args = args,
+      IsCustom = config[3],
+      IsFromModule = config[4],
+      CreateTime = os.date("%H:%M:%S")
+    }
+    LogAmmount = LogAmmount + 1
   elseif call == "Call" then
     Log[call .. typelog .. LogAmmount] = {
       Name = config[1],
       Function = config[2],
       Args = config[3],
       IsCustom = config[4],
+      IsFromModule = config[5],
       CallTime = os.date("%H:%M:%S")
     }
     LogAmmount = LogAmmount + 1
@@ -168,20 +159,25 @@ end
 end
 local ClassFire = {RemoteEvent = "FireServer", RemoteFunction = "InvokeServer", UnreliableRemoteEvent = "FireServer", BindableRemote = "Fire", BindableFunction = "Invoke"}
 local ClassType = {RemoteEvent = true, RemoteFunction = true, UnreliableRemoteEvent = true, BindableRemote = true, BindableFunction = true}
-local function AddFunc(name, func)
+local function AddFunc(name, func, alias)
   if not name then return end
   if not (LightCoding and Functs) then return end
   if func and type(func) == "function" then
     Functs[name] = function(...)
       local args = {...}
-      console("Calling: Function Name: " .. name .. tostring(func))
-      OutputLog("Call", "Function", {name, func, args, false})
-      return func(unpack(args))
+      console("Calling: Function Name: " .. name .. " " .. tostring(func))
+      OutputLog("Call", "Function", {name, func, args, false, false})
+      return func(table.unpack(args))
     end
-    OutputLog("Create", "Function", {name, func, false})
+    if alias and type(alias) == "table" then
+      for _, nameali in ipairs(alias) do
+        AliasMap[nameali] = Functs[name]
+      end
+    end
+    OutputLog("Create", "Function", {name, func, false, false})
   end
 end
-local function AddCustomFunc(name, func, debug, debugtext)
+local function AddCustomFunc(name, func, alias, debug, debugtext)
   if not name then return end
   if not (LightCoding and CustomFuncts) then return end
   debug = debug or false
@@ -194,10 +190,15 @@ local function AddCustomFunc(name, func, debug, debugtext)
           console(text)
         end
       end
-      OutputLog("Call", "Function", {name, func, args, true})
-      return func(unpack(args))
+      OutputLog("Call", "Function", {name, func, args, true, false})
+      return func(table.unpack(args))
     end
-    OutputLog("Create", "Function", {name, func, true})
+    if alias and type(alias) == "table" then
+      for _, nameali in ipairs(alias) do
+        AliasMap[nameali] = CustomFuncts[name]
+      end
+    end
+    OutputLog("Create", "Function", {name, func, true, false})
   end
 end
 local function AddMethod(Name, withself, func)
@@ -209,19 +210,19 @@ local function AddMethod(Name, withself, func)
   if withself then
     LightCoding[Name] = function(self, ...)
       local args = {...}
-      console("Calling Method: Name: " .. Name .. tostring(func))
-      OutputLog("Call", "Method", {Name, func, args, false})
+      console("Calling Method: Name: " .. Name .. " " .. tostring(func))
+      OutputLog("Call", "Method", {Name, func, args, false, false})
       return func(self, table.unpack(args))
     end
   else
     LightCoding[Name] = function(self, ...)
       local args = {...}
-      console("Calling Method: Name: " .. Name .. tostring(func))
-      OutputLog("Call", "Method", {Name, func, args, false})
+      console("Calling Method: Name: " .. Name .. " " .. tostring(func))
+      OutputLog("Call", "Method", {Name, func, args, false, false})
       return func(table.unpack(args))
     end
   end
-  OutputLog("Create", "Method", {Name, func, false})
+  OutputLog("Create", "Method", {Name, func, false, false})
 end
 local function AddCustomMethod(Name, withself, func)
   if not Name then return end
@@ -232,24 +233,24 @@ local function AddCustomMethod(Name, withself, func)
   if withself then
     LightCoding[Name] = function(self, ...)
       local args = {...}
-      console("Calling Method: Name: " .. Name .. tostring(func))
-      OutputLog("Call", "Method", {Name, func, args, true})
+      console("Calling Method: Name: " .. Name .. " " .. tostring(func))
+      OutputLog("Call", "Method", {Name, func, args, true, false})
       return func(self, table.unpack(args))
     end
   else
     LightCoding[Name] = function(self, ...)
       local args = {...}
-      console("Calling Method: Name: " .. Name .. tostring(func))
-      OutputLog("Call", "Method", {Name, func, args, true})
+      console("Calling Method: Name: " .. Name .. " " .. tostring(func))
+      OutputLog("Call", "Method", {Name, func, args, true, false})
       return func(table.unpack(args))
     end
   end
-  OutputLog("Create", "Method", {Name, func, true})
+  OutputLog("Create", "Method", {Name, func, true, false})
 end
 local function CallFunc(name, ...)
   if not LightCoding then return end
   if Functs and CustomFuncts then
-    local func = Functs[name] or CustomFuncts[name]
+    local func = Functs[name] or CustomFuncts[name] or AliasMap[Name]
     if not func then
       error("Function: " .. tostring(name), "Not Found")
       return nil
@@ -259,17 +260,56 @@ local function CallFunc(name, ...)
 end
 local function GetFunc(Name)
   if not Name then return end
-  local Func = Functs[Name] or CustomFuncts[Name]
+  local Func = Functs[Name] or CustomFuncts[Name] or AliasMap[Name]
   if Func then
     return Func
   else
     error("Function: ", tostring(Name), "Not Found")
   end
 end
+local function GetMethod(self, Name)
+  if not Name then return end
+  local method = self[Name]
+  if type(method) ~= "function" then return end
+  if not method then warn("Method: " .. method " Not Found!") return end
+  return function(...)
+    return method(self, ...)
+  end
+end
 local ModuleAPI = {
-  AddFunc = AddFunc,
-  missing = missing
+  missing = missing,
+  Safeget = safeget,
+  Services = Services,
+  Player = plr,
+  Character = char,
+  HumanoidRootPart = hrp
 }
+function ModuleAPI.Subscribe(event, callback)
+  if not Settings.Events.Listeners[event] then
+    Settings.Events.Listeners[event] = {}
+  end
+  table.insert(Settings.Events.Listeners[event], callback)
+end
+function ModuleAPI.Unsubscribe(event, callback)
+  local list = Settings.Events.Listeners[event]
+  if not list then return end
+  for i, cb in ipairs(list) do
+    if cb == callback then
+      table.remove(list, i)
+      break
+    end
+  end
+end
+function ModuleAPI.Publish(event, ...)
+  local list = Settings.Events.Listeners[event]
+  if not list then return end
+  for _, callback in ipairs(list) do
+    local success, err = pcall(callback, ...)
+    if not success then
+      warn("Event error: " .. tostring(err))
+    end
+  end
+end
 -- Methods
 AddMethod("IsLoaded", true, function(self)
   return self.Settings.Loaded
@@ -312,204 +352,44 @@ AddMethod("AddCustomMethod", false, AddCustomMethod)
 AddMethod("AddCustomFunc", false, AddCustomFunc)
 AddMethod("CallFunc", false, CallFunc)
 AddMethod("GetFunc", false, GetFunc)
+AddMethod("GetMethod", true, GetMethod)
 -- Main Functions
-local function ControlHooks()
-  Hookses.BlockRemoteInstall = next(BlockedRemotes) ~= nil
-  Hookses.HookRemoteInstall = next(HookedRemotes) ~= nil
-  Hookses.SpeficHookInstall = next(HookedSpecial) ~= nil
+local function DeepCopy(t)
+  if type(t) ~= "table" then return t end
+  local copy = {}
+  for k, v in pairs(t) do
+    copy[DeepCopy(k)] = DeepCopy(v)
+  end
+  return copy
 end
-local function SetupRemotes()
-  if Hookses.GlobalHookActivated then return end
-  Hookses.GlobalHookActivated = true
-  local old;
-  old = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
-    local method = getnamecallmethod()
-    local firemethod = ClassFire[self.ClassName]
-    local class = ClassType[self.ClassName]
-    if Hookses.BlockRemoteInstall and BlockedRemotes[self] and class and method == firemethod then
-      return nil
+AddFunc("DeepCopy", DeepCopy)
+local function Merge(t1, t2)
+  local result = DeepCopy(t1)
+  for k, v in pairs(t2) do
+    if type(v) == "table" and type(result[k]) == "table" then
+      result[k] = Merge(result[k], v)
+    else
+      result[k] = v
     end
-    local HookSpec = HookedSpecial[self]
-    if Hookses.SpeficHookInstall and HookSpec and type(HookSpec) == "table" and HookSpec[method] then
-      local CallBack = HookSpec[method]
-      local newargs = CallBack({...})
-      if type(newargs) == "table" then
-        return old(self, table.unpack(newargs))
-      else
-        return
-      end
+  end
+  return result
+end
+AddFunc("Merge", Merge)
+local function FindInTable(t, mode, value)
+  if not mode or mode ~= "string" or not value then return end
+  if type(t) ~= "table" then return end
+  if mode == "Value" then
+    for k, v in pairs(t) do
+      if v == value then return k end
     end
-    local hookremote = HookedRemotes[self]
-    if Hookses.HookRemoteInstall and hookremote and class and method == firemethod then
-      local newargs = hookremote({...})
-      if type(newargs) == "table" then
-        return old(self, table.unpack(newargs))
-      else
-        return
-      end
+  elseif mode == "Key" then
+    for k, v in pairs(t) do
+      if k == value then return v end
     end
-    return old(self, ...)
-  end))
-  ControlHooks()
-end
-local function BlockRE(remote)
-  if not remote then return end
-  if not ClassType[remote.ClassName] then return end
-  if not BlockedRemotes[remote] then
-    if HookedRemotes[remote] then
-      return "Remote Already Hooked!"
-    end
-    BlockedRemotes[remote] = true
-    SetupRemotes()
-    ControlHooks()
   end
+  return nil
 end
-local function UnBlockRE(remote)
-  if not remote then return end
-  if BlockedRemotes[remote] then
-    BlockedRemotes[remote] = nil
-    ControlHooks()
-  end
-end
--- Hooks
-local function HookRE(remote, callback)
-  if not remote then return end
-  if type(callback) ~= "function" then return end
-  if not ClassType[remote.ClassName] then return end
-  if not HookedRemotes[remote] then
-    if BlockedRemotes[remote] then
-      return "Remote Already Blocked"
-    end
-    HookedRemotes[remote] = callback
-    SetupRemotes()
-    ControlHooks()
-  end
-end
-local function UnHookRE(remote)
-  if not remote then return end
-  if HookedRemotes[remote] then
-    HookedRemotes[remote] = nil
-    ControlHooks()
-  end
-end
-local function HookMethod(obj, method, callback)
-  if not obj or not method or type(method) ~= "string" or type(callback) ~= "function" then return end
-  if not HookedSpecial[obj] then
-    HookedSpecial[obj] = {}
-  elseif HookedSpecial[obj][method] then
-    return "Method Already Hooked!"
-  end
-  HookedSpecial[obj][method] = callback
-  SetupRemotes()
-  ControlHooks()
-end
-local function UnHookMethod(obj, method)
-  if not obj then return end
-  if method then
-    if HookedSpecial[obj] and HookedSpecial[obj][method] and type(HookedSpecial[obj]) == "table" then
-      HookedSpecial[obj][method] = nil
-      if next(HookedSpecial[obj]) == nil then
-        HookedSpecial[obj] = nil
-      end
-      ControlHooks()
-    end
-  else
-    HookedSpecial[obj] = nil
-  end
-end
-local function HookFunction(targetfunc, newfunc)
-  if not targetfunc or type(targetfunc) ~= "function" or not newfunc or type(newfunc) ~= "function" then return end
-  if HookedFunctions[targetfunc] then
-    return "Function Already Hooked!"
-  end
-  local original = targetfunc
-  local success, hooked = pcall(hookfunction, targetfunc, newcclosure(newfunc))
-  if not success then console("hookfunction Failed") return end
-  HookedFunctions[targetfunc] = original
-  return original
-end
-local function UnHookFunction(func)
-  if not func or not HookedFunctions[func] then return end
-  local original = HookedFunctions[func]
-  local success = pcall(hookfunction, func, original)
-  if not success then console("Failed to UnHook") return end
-  HookedFunctions[func] = nil
-end
-local function HookPropertyRead(obj, callback)
-  if not obj or type(callback) ~= "function" then return end
-  if HookedPropertyRead[obj] then return "Property read already hooked on this object" end
-  local mt = getrawmetatable(obj)
-  if not mt then return "Metatable not found for object" end
-  local original = mt.__index
-  local hooked = newcclosure(function(self, key)
-    local result = callback(self, key, original)
-    if result ~= nil then return result end
-    if original then
-      if type(original) == "function" then
-        return original(self, key)
-      else
-        return original[key]
-      end
-    end
-    return nil
-  end)
-  mt.__index = hooked
-  HookedPropertyRead[obj] = {original = original, hooked = hooked}
-end
-local function UnHookPropertyRead(obj)
-  if not obj then return end
-  local data = HookedPropertyRead[obj]
-  if not data then return end
-  local mt = getrawmetatable(obj)
-  if mt then
-    mt.__index = data.original
-  end
-  HookedPropertyRead[obj] = nil
-end
-local function HookPropertyWrite(obj, callback)
-  if not obj or type(callback) ~= "function" then return end
-  if HookedPropertyWrite[obj] then return "Property write already hooked on this object" end
-  local mt = getrawmetatable(obj)
-  if not mt then return "Metatable not found for object" end
-  local original = mt.__newindex
-  local hooked = newcclosure(function(self, key, value)
-    local newValue = callback(self, key, value, original)
-    if newValue == nil then return end
-      if original then
-        if type(original) == "function" then
-          original(self, key, newValue)
-        else
-          original[key] = newValue
-        end
-      else
-        rawset(self, key, newValue)
-      end
-  end)
-  mt.__newindex = hooked
-  HookedPropertyWrite[obj] = { original = original, hooked = hooked }
-end
-local function UnHookPropertyWrite(obj)
-  if not obj then return end
-  local data = HookedPropertyWrite[obj]
-  if not data then return end
-  local mt = getrawmetatable(obj)
-  if mt then
-    mt.__newindex = data.original
-  end
-  HookedPropertyWrite[obj] = nil
-end
-AddFunc("BlockRE", BlockRE)
-AddFunc("UnBlockRE", UnBlockRE)
-AddFunc("HookRE", HookRE)
-AddFunc("UnHookRE", UnHookRE)
-AddFunc("HookMethod", HookMethod)
-AddFunc("UnHookMethod", UnHookMethod)
-AddFunc("HookFunction", HookFunction)
-AddFunc("UnHookFunction", UnHookFunction)
-AddFunc("HookIndex", HookPropertyRead)
-AddFunc("UnHookIndex", UnHookPropertyRead)
-AddFunc("HookNewIndex", HookPropertyWrite)
-AddFunc("UnHookNewIndex", UnHookPropertyWrite)
+AddFunc("FindInTable", FindInTable)
 AddFunc("say", function(...)
   print(...)
 end)
@@ -518,7 +398,7 @@ AddFunc("warnmsg", function(...)
 end)
 AddFunc("service", function(Name)
   if not Name then return end
-  return game:GetService(Name)
+  return safeget(game:GetService(Name))
 end)
 AddFunc("create", function(Name)
   if not Name then return end
