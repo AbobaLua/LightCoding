@@ -24,6 +24,13 @@
   local newsay = LightCoding:GetFunc("say")
   newsay("Hello")
   ```
+  #### GetMethod() - Get Method
+   Arguments - 1
+   First argument - Method for the get (required)
+  ```lua
+  local call = LightCoding:GetMethod("CallFunc")
+  call("say", "Hello")
+  ```
   #### IsLoaded() - Loading check
    Arguments - 0 (None)
    Returns the loaded status of LightCoding (true/false)
@@ -39,7 +46,7 @@
   #### LoadModule() - Load Module
    Arguments - 1
    First argument - name of Module
-   Modules: Extra, Extra Functions
+   Modules: Extra, Extra Functions, Net, Player, ESP, GUI
   ```lua
   LightCoding:LoadModule("Extra")
   ```
@@ -107,17 +114,25 @@
   LightCoding:CallFunc("pfireproximitypromt", workspace.ProximityPrompt)
   -- fire proximityprompt in workspace
   ```
-  #### BlockRE() - Block remote calls (already existed, but now compatible)
-   Arguments - 1
-   First argument - remote for block (required)
-  ```lua
-  LightCoding:CallFunc("BlockRE", game.workspace.RemoteEvent)
-  ```
+---
+
+### Modules
+
+#### Net - Not working now
+
+#### BlockRE() - Block remote calls (already existed, but now compatible)
+
+Arguments - 1
+First argument - remote for block (required)
+```lua
+local Net = LightCoding:LoadModule("Net")
+Net.BlockRE(game.workspace.RemoteEvent)
+```
   #### UnBlockRE() - UnBlock remote
    Arguments - 1
    First argument - remote for unblock (required)
   ```lua
-  LightCoding:CallFunc("UnBlockRE", game.workspace.RemoteEvent)
+  Net.UnBlockRE(game.workspace.RemoteEvent)
   ```
   #### HookRE() - Intercept RemoteEvent/RemoteFunction or other Event calls
    Allows you to intercept "FireServer" (RemoteEvent) or InvokeServer (RemoteFunction) or other calls.
@@ -129,20 +144,20 @@
    Warning:
     If you don't return any arguments, the call will block
     ```lua
-    LightCoding:CallFunc("HookRE", game.workspace.RemoteEvent, function(args)
+    Net.HookRE(game.workspace.RemoteEvent, function(args)
       print("Hooked!") -- Is will Blocked and print "Hooked!" when they call
     end)
     ```
     The correct path so that remove is not blocked
     ```lua
-    LightCoding:CallFunc("HookRE", game.workspace.RemoteEvent, function(args)
+    Net.HookRE(game.workspace.RemoteEvent, function(args)
       print("Hooked!")
       return args
     end)
     ```
   Example:
   ```lua
-  LightCoding:CallFunc("HookRE", game.workspace.RemoteEvent, function(args)
+  Net.HookRE(game.workspace.RemoteEvent, function(args)
     print("Hooked!")
     return args
   end)
@@ -150,14 +165,14 @@
   Other Examples:
   1: Hook of argument number one
   ```lua
-  LightCoding:CallFunc("HookRE", game.workspace.RemoteEvent, function(args)
+  Net.HookRE(game.workspace.RemoteEvent, function(args)
     args[1] = 10
     return args
   end)
   ```
   2: Prints and returns the previous arguments
   ```lua
-  LightCoding:CallFunc("HookRE", game.workspace.RemoteEvent, function(args)
+  Net.HookRE(game.workspace.RemoteEvent, function(args)
     print("Hooked with args: ", unpack(args))
     return args
   end)
@@ -166,7 +181,7 @@
    Arguments - 1
    First argument - remote for unhook (required)
   ```lua
-  LightCoding:CallFunc("UnHookRE", game.workspace.RemoteEvent)
+  Net.UnHookRE(game.workspace.RemoteEvent)
   ```
   #### HookMethod() - Hook object method
    Arguments - 3
@@ -178,14 +193,14 @@
      If you don't return any arguments, the call will block
   Example:
    ```lua
-   LightCoding:CallFunc("HookMethod", game.workspace.Part, "Destroy", function(args)
+   Net.HookMethod(game.workspace.Part, "Destroy", function(args)
      print("Attempt to Destroy Part")
      return args
    end)
    ```
   Example 2:
    ```lua
-   LightCoding:CallFunc("HookMethod", game.workspace.Part, "Clone", function(args)
+   Net.HookMethod(game.workspace.Part, "Clone", function(args)
      print("Attempt to Clone Part: Blocking")
      return nil
    end)
@@ -196,7 +211,7 @@
    First argument - object for UnHook (required)
    Second argument - method for unhook (optional)
   ```lua
-  LightCoding:CallFunc("UnHookMethod", game.workspace.Part, "Destroy")
+  Net.UnHookMethod(game.workspace.Part, "Destroy")
   ```
   #### Note: A remote cannot be hooked and blocked at the same time
   If you try to hook a blocked remote, it will return warning line
@@ -206,7 +221,7 @@
    Second argument - new function (required)
    Note: if you call HookFunction it return original function
   ```lua
-  local oldprint = LightCoding:CallFunc("HookFunction", print, function(...)
+  local oldprint = Net.HookFunction(print, function(...)
     print("Hoked with args: ", ...)
     oldprint(...)
   end)
@@ -215,7 +230,7 @@
   Arguments - 1
   First argument - function for unhook (required)
   ```lua
-  LightCoding:CallFunc("UnHookFunction", print)
+  Net.UnHookFunction(print)
   ```
   #### HookIndex() - Hook Index - intercept property reads
   Arguments - 2 (+3)
@@ -227,7 +242,7 @@
   Warning:
    If you don't return any arguments, the call will block
   ```lua
-  LightCoding:CallFunc("HookIndex", game.workspace.Part, function(self, key, original)
+  Net.HookIndex(game.workspace.Part, function(self, key, original)
     if key == "Name" then
       return "Hooked"
     end
@@ -238,7 +253,7 @@
   Arguments - 1
   First argument - object index for unhook (required)
   ```lua
-  LightCoding:CallFunc("UnHookIndex", game.workspace.Part)
+  Net.UnHookIndex(game.workspace.Part)
   ```
   #### HookNewIndex() - Hook NewIndex - intercept property write
   Arguments - 2 (+4)
@@ -251,7 +266,7 @@
   Warning:
    If you don't return any arguments, the call will block
   ```lua
-  LightCoding:CallFunc("HookNewIndex", game.workspace.Part, function(self, key, value, original)
+  Net.HookNewIndex(game.workspace.Part, function(self, key, value, original)
     if key == "Position" then
       return Vector3.new(10, 50, 10)
     end
@@ -262,9 +277,8 @@
   Arguments - 1
   First argument - object newindex for unhook (required)
   ```lua
-  LightCoding:CallFunc("UnHookNewIndex", game.workspace.Part)
+  Net.UnHookNewIndex(game.workspace.Part)
   ```
----
 
 ### Custom things
   #### How To Create Custom Function, AddCustomFunc()
@@ -277,7 +291,7 @@
   ```lua
   LightCoding:AddCustomFunc("Hi", function()
   print("Hi")
-  end, true, "Debug Working!")
+  end, {"Hi2"}, true, "Debug Working!")
   ```
   #### How To Create Custom Method, AddCustomMethod()
    Arguments - 3
