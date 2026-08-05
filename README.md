@@ -48,7 +48,7 @@
    First argument - name of Module
    Modules: Extra, Extra Functions, Net, Player, ESP, GUI
   ```lua
-  LightCoding:LoadModule("Extra")
+  local Extra = LightCoding:LoadModule("Extra")
   ```
   #### ClearLog() - Clear Log
    Arguments - 0 (None)
