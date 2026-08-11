@@ -8,6 +8,7 @@ local function missing(t, f, fallback)
 end
 local ModulFolder = "https://raw.githubusercontent.com/AbobaLua/LightCoding/Beta/Modules/"
 local luaprefix = ".lua"
+local form;
 form = function(txt)
   return (ModulFolder .. txt .. luaprefix)
 end
