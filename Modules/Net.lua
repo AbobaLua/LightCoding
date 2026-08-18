@@ -2,19 +2,23 @@ return function(lib, api)
   local Net = {
     Simple = {},
     Advanced = {},
-    Utils = {}
+    Utils = {},
+    Configuration = {
+      BlockMarker = "%%Block%%"
+    },
   }
   local HooksState = {
     GlobalActivated = {
       HookNameCall = false,
       IndexHook = false,
-      NewIndexHook = false,
+      NewIndexHook = false
     },
     Installed = {
       BlockRemote = false,
       HookRemote = false,
       SpeficBlock = false,
       SpeficHook = false,
+      ConnectSignalHook = false,
       BlockIndex = false,
       HookIndex = false,
       BlockNewIndex = false,
@@ -23,25 +27,25 @@ return function(lib, api)
       HookNewIndexS = false
     }
   }
-  local Simple, Advanced, Utils = Net.Simple, Net.Advanced, Net.Utils
+  local Simple, Advanced, Utils, Configuration = Net.Simple, Net.Advanced, Net.Utils, Net.Configuration
   local HookInstall, GlobalActivate = HookState.Installed, HookState.GlobalActivated
   local BlockedRemotes, BlockedSpecial, BlockedFunctions, BlockedIndex, BlockedNewIndex = {}, {}, {}, {}, {}
-  local HookedRemotes, HookedSpecial, HookedFunctions, HookedIndex, HookedNewIndex = {}, {}, {}, {}, {}
+  local HookedRemotes, HookedSpecial, HookedConnectSignal, HookedFunctions, HookedIndex, HookedNewIndex = {}, {}, {}, {}, {}, {}
   local HookedIndexS, HookedNewIndexS = {}, {}
   local function ControlHooks()
-    local function check(flag, table) 
-      flag = next(table) ~= nil
+    local function check(t) 
+      return next(t) ~= nil
     end
-    HookInstall.BlockRemoteInstall = next(BlockedRemotes) ~= nil
-    HookInstall.HookRemoteInstall = next(HookedRemotes) ~= nil
-    HookInstall.SpeficBlockInstall = next(BlockedSpecial) ~= nil
-    HookInstall.SpeficHookInstall = next(HookedSpecial) ~= nil
-    HookInstall.BlockIndexInstall = next(BlockedIndex) ~= nil
-    HookInstall.HookIndexInstall = next(HookedIndex) ~= nil
-    HookInstall.BlockNewIndexInstall = next(BlockedNewIndex) ~= nil
-    HookInstall.HookNewIndexInstall = next(HookedNewIndex) ~= nil
-    HookInstall.HookIndexSInstall = next(HookedIndexS) ~= nil
-    HookInstall.HookNewIndexSInstall = next(HookedNewIndexS) ~= nil
+    HookInstall.BlockRemoteInstall = check(BlockedRemotes)
+    HookInstall.HookRemoteInstall = check(HookedRemotes)
+    HookInstall.SpeficBlockInstall = check(BlockedSpecial)
+    HookInstall.SpeficHookInstall = check(HookedSpecial)
+    HookInstall.BlockIndexInstall = check(BlockedIndex)
+    HookInstall.HookIndexInstall = check(HookedIndex)
+    HookInstall.BlockNewIndexInstall = check(BlockedNewIndex)
+    HookInstall.HookNewIndexInstall = check(HookedNewIndex)
+    HookInstall.HookIndexSInstall = check(HookedIndexS)
+    HookInstall.HookNewIndexSInstall = check(HookedNewIndexS)
   end
   local ClassFire = {RemoteEvent = "FireServer", RemoteFunction = "InvokeServer", UnreliableRemoteEvent = "FireServer", BindableRemote = "Fire", BindableFunction = "Invoke"}
   local ClassType = {RemoteEvent = true, RemoteFunction = true, UnreliableRemoteEvent = true, BindableRemote = true, BindableFunction = true}
@@ -64,19 +68,37 @@ return function(lib, api)
       if HookInstall.SpeficHook and HookSpec and type(HookSpec) == "table" and HookSpec[method] then
         local CallBack = HookSpec[method]
         local newargs = CallBack({...})
-        if type(newargs) == "table" then
-          return oldNamecall(self, table.unpack(newargs))
-        else
+        if type(newargs) == "string" and newargs == Configuration.BlockMarker then
           return
+        elseif type(newargs) == "table" then
+          return oldNamecall(self, table.unpack(newargs))
         end
       end
       local hookremote = HookedRemotes[self]
       if HookInstall.HookRemote and hookremote and class and method == firemethod then
         local newargs = hookremote({...})
-        if type(newargs) == "table" then
-          return oldNamecall(self, table.unpack(newargs))
-        else
+        if type(newargs) == "string" and newargs == Configuration.BlockMarker then
           return
+        elseif type(newargs) == "table" then
+          return oldNamecall(self, table.unpack(newargs))
+        end
+      end
+      if HookInstall.ConnectSignalHook and HookedConnectSignal[self] and method == "Connect" and typeof(self) == "RBXScriptSignal" then
+        local args = {...}
+        local originalCallback = args[1]
+        if type(originalCallback) == "function" then
+          local wrapped = newcclosure(function(...)
+            local result = HookedConnectSignal[self]({...})
+            if result == Configuration.BlockMarker then
+              return
+            elseif type(result) == "table" then
+              originalCallback(table.unpack(result))
+            else
+              originalCallback(...)
+            end
+          end)
+          args[1] = wrapped
+          return oldNamecall(self, table.unpack(args))
         end
       end
       return oldNamecall(self, ...)
@@ -91,11 +113,11 @@ return function(lib, api)
         return nil
       end
       if HookInstall.HookIndex and HookedIndex[self] then
-        local newargs = hookIndex(property)
-        if type(newargs) == "table" then
-          return oldIndex(self, table.unpack(newargs))
-        else
-          return
+        local newval = HookedIndex[self](property)
+        if newval == Configuration.BlockMarker then
+          return nil
+        elseif newval ~= nil then
+          return newval
         end
       end
       if HookInstall.HookIndexS and HookedIndexS[self] and HookedIndexS[self][property] then
@@ -113,17 +135,17 @@ return function(lib, api)
         return nil
       end
       if HookInstall.HookNewIndex and HookedNewIndex[self] then
-        local newargs = hookNewIndex(property, newValue)
-        if type(newargs) == "table" then
-          return oldNewIndex(self, property, table.unpack(newargs))
-        else
-          return
+        local newval = HookedNewIndex[self](property, newValue)
+        if newval == Configuration.BlockMarker then
+          return nil
+        elseif newval ~= nil then
+          return oldNewIndex(self, property, newval)
         end
       end
       if HookInstall.HookNewIndexS and HookedNewIndexS[self] and HookedNewIndexS[self][property] then
-        return HookedNewIndexS[self][property]
+        return oldNewIndex(self, property, HookedNewIndexS[self][property])
       end
-      return oldIndex(self, property, newValue)
+      return oldNewIndex(self, property, newValue)
     end))
   end
   local function Simple.BlockRE(remote)
@@ -216,6 +238,19 @@ return function(lib, api)
     else
       HookedSpecial[obj] = nil
     end
+  end
+  function Advanced.HookOnClientEvent(obj, callback)
+    if not obj or not callback or type(callback) ~= "function" then return end
+    local signal = obj.OnClientEvent
+    if not signal then return "Invalid Object, Object no have OnClientEvent" end
+    HookedConnectSignal[signal] = callback
+    SetupNameCall()
+  end
+  function Advanced.UnHookOnClientEvent(obj)
+    if not obj or not HookedConnectSignal[obj] then return end
+    local signal = obj.OnClientEvent
+    if not signal then return "Invalid Object, Object no have OnClientEvent" end
+    HookedConnectSignal[signal] = nil
   end
   function Simple.BlockFunction(targetfunc)
     if not targetfunc or type(targetfunc) ~= "function" then return end
