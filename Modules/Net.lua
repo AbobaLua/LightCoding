@@ -18,7 +18,6 @@ return function(lib, api)
       HookRemote = false,
       SpeficBlock = false,
       SpeficHook = false,
-      ConnectSignalHook = false,
       BlockIndex = false,
       HookIndex = false,
       BlockNewIndex = false,
@@ -81,24 +80,6 @@ return function(lib, api)
           return
         elseif type(newargs) == "table" then
           return oldNamecall(self, table.unpack(newargs))
-        end
-      end
-      if HookInstall.ConnectSignalHook and HookedConnectSignal[self] and method == "Connect" and typeof(self) == "RBXScriptSignal" then
-        local args = {...}
-        local originalCallback = args[1]
-        if type(originalCallback) == "function" then
-          local wrapped = newcclosure(function(...)
-            local result = HookedConnectSignal[self]({...})
-            if result == Configuration.BlockMarker then
-              return
-            elseif type(result) == "table" then
-              originalCallback(table.unpack(result))
-            else
-              originalCallback(...)
-            end
-          end)
-          args[1] = wrapped
-          return oldNamecall(self, table.unpack(args))
         end
       end
       return oldNamecall(self, ...)
@@ -243,14 +224,40 @@ return function(lib, api)
     if not obj or not callback or type(callback) ~= "function" then return end
     local signal = obj.OnClientEvent
     if not signal then return "Invalid Object, Object no have OnClientEvent" end
-    HookedConnectSignal[signal] = callback
-    SetupNameCall()
+    if not HookedConnectSignal[obj] then
+      HookedConnectSignal[obj] = {}
+    end
+    for _, Connection in getconnections(signal) do  
+      local old; old = hookfunction(Connection.Function, function(...)
+        local args = {...}
+        local result = callback(args)
+        if result == Configuration.BlockMarker then
+          return
+        elseif type(result) == "table" then
+          return old(table.unpack(result))
+        end
+        return old(table.unpack(args))
+      end)
+      HookedConnectSignal[obj][Connection] = old
+    end
   end
   function Advanced.UnHookOnClientEvent(obj)
     if not obj or not HookedConnectSignal[obj] then return end
     local signal = obj.OnClientEvent
     if not signal then return "Invalid Object, Object no have OnClientEvent" end
-    HookedConnectSignal[signal] = nil
+    for _, conn in ipairs(getconnections(signal)) do
+      local original = HookedConnectSignal[obj][conn]
+      if original then
+        if type(restorefunction) == "function" then
+          restorefunction(original)
+        elseif type(hookfunction) == "function" then
+          hookfunction(conn.Function, original)
+        else
+          warn("Unable to restore: neither restorefunction nor hookfunction available")
+        end
+      end
+    end
+    HookedConnectSignal[obj] = nil
   end
   function Simple.BlockFunction(targetfunc)
     if not targetfunc or type(targetfunc) ~= "function" then return end
