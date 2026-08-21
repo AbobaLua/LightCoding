@@ -316,12 +316,13 @@ AddMethod("ClearLog", true, function(self)
     self.Log[i] = nil
   end
 end)
-AddMethod("LoadModule", true, function(self, name)
+AddMethod("LoadModule", true, function(self, name, safe)
   if not name or name == "LoadedModules" then return end
   local modulelink = self.Settings.Modules[name]
   if not modulelink then return end
   local cache = self.Settings.Modules.LoadedModules
   if cache[name] then return cache[name] end
+  if safe then
   local success, result = pcall(function()
     local code = game:HttpGet(modulelink)
     local modulefunc = loadstring(code)
@@ -334,6 +335,9 @@ AddMethod("LoadModule", true, function(self, name)
   end
   cache[name] = result
   return result
+  else
+    return loadstring(game:HttpGet(modulelink))(self, ModuleAPI)
+  end
 end)
 AddMethod("AddCustomMethod", false, AddCustomMethod)
 AddMethod("AddCustomFunc", false, AddCustomFunc)
