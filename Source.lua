@@ -316,7 +316,7 @@ AddMethod("ClearLog", true, function(self)
     self.Log[i] = nil
   end
 end)
-AddMethod("LoadModule", true, function(self, name, debug)
+AddMethod("LoadModule", true, function(self, name)
   if not name or name == "LoadedModules" then return end
   local modulelink = self.Settings.Modules[name]
   if not modulelink then return end
@@ -331,7 +331,7 @@ AddMethod("LoadModule", true, function(self, name, debug)
     return modulefunc(self, ModuleAPI)
   end)
   if not success then
-    if debug then
+    if getgenv().LCDebug then
       warn("LoadModule: failed to load '" .. name .. "' – " .. tostring(result))
       warn("Stack trace: " .. debug.traceback())
     else
