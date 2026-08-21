@@ -227,6 +227,7 @@ return function(lib, api)
     if not HookedConnectSignal[obj] then
       HookedConnectSignal[obj] = {}
     end
+    if not getconnections then warn("getconnections not found") return end
     for _, Connection in getconnections(signal) do  
       local old; old = hookfunction(Connection.Function, function(...)
         local args = {...}
@@ -245,6 +246,7 @@ return function(lib, api)
     if not obj or not HookedConnectSignal[obj] then return end
     local signal = obj.OnClientEvent
     if not signal then return "Invalid Object, Object no have OnClientEvent" end
+    if not getconnections then warn("getconnections not found") return end
     for _, conn in ipairs(getconnections(signal)) do
       local original = HookedConnectSignal[obj][conn]
       if original then
@@ -275,10 +277,11 @@ return function(lib, api)
   function Simple.UnBlockFunction(func)
     if not func or not BlockedFunctions[func] then return end
     local original = BlockedFunctions[func]
+    local success
     if restorefunction then
-      local success = pcall(restorefunction, func)
+      success = pcall(restorefunction, func)
     else
-      local success = pcall(hookfunction, func, original)
+      success = pcall(hookfunction, func, original)
     end
     if not success then console("Failed to UnBlock") return end
     BlockedFunctions[func] = nil
@@ -297,16 +300,17 @@ return function(lib, api)
   function Advanced.UnHookFunction(func)
     if not (func and HookedFunctions[func]) then return end
     local original = HookedFunctions[func]
+    local success
     if restorefunction then
-      local success = pcall(restorefunction, func)
+      success = pcall(restorefunction, func)
     else
-      local success = pcall(hookfunction, func, original)
+      success = pcall(hookfunction, func, original)
     end
     if not success then console("Failed to UnHook") return end
     HookedFunctions[func] = nil
   end
   function Simple.BlockIndex(obj, property)
-    if not obj or not property then return end
+    if not (obj and property) then return end
     if not BlockedIndex[obj] then
       BlockedIndex[obj] = {}
     end
@@ -405,7 +409,7 @@ return function(lib, api)
     end
     ControlHooks()
   end
-  function Net.Utils.ScanRemotes()
+  function Utils.ScanRemotes()
     local remotes = {}
     local function scan(container)
       for _, child in ipairs(container:GetChildren()) do
@@ -424,7 +428,7 @@ return function(lib, api)
     scan(game)
     return remotes
   end
-  function Net.Utils.FireRemote(remote, ...)
+  function Utils.FireRemote(remote, ...)
     if not remote then return end
     local methodName = ClassFire[remote.ClassName]
     if not methodName then return warn("Unsupported remote class") end
@@ -454,9 +458,8 @@ return function(lib, api)
     for obj in pairs(BlockedNewIndex) do Simple.UnBlockNewIndex(obj) end
     ControlHooks()
   end
-  function Net.Utils.ClearAll()
+  function Utils.ClearAll()
     Utils.ClearAllHooks()
     Utils.ClearAllBlocks()
   end
-  return Net
-end
+  return Net end
