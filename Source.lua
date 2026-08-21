@@ -8,7 +8,7 @@ local function missing(t, f, fallback)
 end
 local form
 form = function(txt)
-  return ("https://raw.githubusercontent.com/AbobaLua/LightCoding/Beta/Modules/" .. txt .. ".lua ")
+  return ("https://raw.githubusercontent.com/AbobaLua/LightCoding/Beta/Modules/" .. txt .. ".lua")
 end
 local LightCoding = {
   Info = {
