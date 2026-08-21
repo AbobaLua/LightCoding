@@ -6,11 +6,9 @@ local function missing(t, f, fallback)
   if type(f) == t then return f end
   return fallback
 end
-local ModulFolder = "https://raw.githubusercontent.com/AbobaLua/LightCoding/Beta/Modules/"
-local luaprefix = ".lua"
-local form;
+local form
 form = function(txt)
-  return (ModulFolder .. txt .. luaprefix)
+  return ("https://raw.githubusercontent.com/AbobaLua/LightCoding/Beta/Modules/" .. txt .. ".lua ")
 end
 local LightCoding = {
   Info = {
@@ -103,7 +101,7 @@ local function Initialization()
     Settings.Loaded = true
   end
   env.LCLoaded = true
-  local loadTime = (os.clock() - startTime) * 1000  -- в миллисекундах
+  local loadTime = (os.clock() - startTime) * 1000
   print(string.format("Loaded in %.2f ms", loadTime))
 end
 local function console(...)
@@ -112,11 +110,7 @@ local function console(...)
   end
 end
 local function OutputLog(call, typelog, config)
-  if not Log then return end
-  if not call then return end
-  if not typelog then return end
-  if not config then return end
-  if type(config) ~= "table" then return end
+  if not (Log and call and typelog and config and type(config) == "table") then return end
   if call == "Create" then
     local info = debug.getinfo(config[2])
     local args = {}
@@ -142,7 +136,6 @@ local function OutputLog(call, typelog, config)
       Function = config[2],
       Args = args,
       IsCustom = config[3],
-      IsFromModule = config[4],
       CreateTime = os.date("%H:%M:%S")
     }
     LogAmmount = LogAmmount + 1
@@ -152,7 +145,6 @@ local function OutputLog(call, typelog, config)
       Function = config[2],
       Args = config[3],
       IsCustom = config[4],
-      IsFromModule = config[5],
       CallTime = os.date("%H:%M:%S")
     }
     LogAmmount = LogAmmount + 1
@@ -161,53 +153,46 @@ end
 local ClassFire = {RemoteEvent = "FireServer", RemoteFunction = "InvokeServer", UnreliableRemoteEvent = "FireServer", BindableRemote = "Fire", BindableFunction = "Invoke"}
 local ClassType = {RemoteEvent = true, RemoteFunction = true, UnreliableRemoteEvent = true, BindableRemote = true, BindableFunction = true}
 local function AddFunc(name, func, alias)
-  if not name then return end
-  if not (LightCoding and Functs) then return end
-  if func and type(func) == "function" then
-    Functs[name] = function(...)
-      local args = {...}
-      console("Calling: Function Name: " .. name .. " " .. tostring(func))
-      OutputLog("Call", "Function", {name, func, args, false, false})
-      return func(table.unpack(args))
-    end
-    if alias and type(alias) == "table" then
-      for _, nameali in ipairs(alias) do
-        AliasMap[nameali] = Functs[name]
-      end
-    end
-    OutputLog("Create", "Function", {name, func, false, false})
+  if not (name and func and type(func) == "function" and Functs) then return end
+  Functs[name] = function(...)
+    local args = {...}
+    console("Calling: Function Name: " .. name .. " " .. tostring(func))
+    OutputLog("Call", "Function", {name, func, args, false})
+    return func(table.unpack(args))
   end
+  if alias and type(alias) == "table" then
+    for _, nameali in ipairs(alias) do
+      AliasMap[nameali] = Functs[name]
+    end
+  end
+  OutputLog("Create", "Function", {name, func, false})
 end
 local function AddCustomFunc(name, func, alias, debug, debugtext)
-  if not name then return end
-  if not (LightCoding and CustomFuncts) then return end
+  if not (name and func and CustomFuncts) then return end
   debug = debug or false
-  if func and type(func) == "function" then
-    CustomFuncts[name] = function(...)
-      local args = {...}
-      if debug then
-        local text = tostring(debugtext)
-        if text then
-          console(text)
-        end
-      end
-      OutputLog("Call", "Function", {name, func, args, true, false})
-      return func(table.unpack(args))
-    end
-    if alias and type(alias) == "table" then
-      for _, nameali in ipairs(alias) do
-        AliasMap[nameali] = CustomFuncts[name]
+  if type(func) ~= "function" then return end
+  CustomFuncts[name] = function(...)
+    local args = {...}
+    if debug then
+      local text = tostring(debugtext)
+      if text then
+        console(text)
       end
     end
-    OutputLog("Create", "Function", {name, func, true, false})
+    OutputLog("Call", "Function", {name, func, args, true})
+    return func(table.unpack(args))
   end
+  if alias and type(alias) == "table" then
+    for _, nameali in ipairs(alias) do
+      AliasMap[nameali] = CustomFuncts[name]
+    end
+  end
+  OutputLog("Create", "Function", {name, func, true})
 end
 local function AddMethod(Name, withself, func)
-  if not Name then return end
-  if not func then return end
+  if not (Name and func) then return end
   withself = withself or false
   if type(func) ~= "function" then return end
-  if not LightCoding then return end
   if withself then
     LightCoding[Name] = function(self, ...)
       local args = {...}
@@ -226,11 +211,9 @@ local function AddMethod(Name, withself, func)
   OutputLog("Create", "Method", {Name, func, false, false})
 end
 local function AddCustomMethod(Name, withself, func)
-  if not Name then return end
-  if not func then return end
+  if not (Name and func) then return end
   withself = withself or false
   if type(func) ~= "function" then return end
-  if not LightCoding then return end
   if withself then
     LightCoding[Name] = function(self, ...)
       local args = {...}
@@ -249,18 +232,16 @@ local function AddCustomMethod(Name, withself, func)
   OutputLog("Create", "Method", {Name, func, true, false})
 end
 local function CallFunc(name, ...)
-  if not LightCoding then return end
-  if Functs and CustomFuncts then
-    local func = Functs[name] or CustomFuncts[name] or AliasMap[Name]
-    if not func then
-      error("Function: " .. tostring(name), "Not Found")
-      return nil
-    end
-    return func(...)
+  if not (Functs and CustomFuncts) then return end
+  local func = Functs[name] or CustomFuncts[name] or AliasMap[Name]
+  if not func then
+    error("Function: " .. tostring(name), " Not Found")
+    return nil
   end
+  return func(...)
 end
 local function GetFunc(Name)
-  if not Name then return end
+  if not (Name and Functs and CustomFuncts) then return end
   local Func = Functs[Name] or CustomFuncts[Name] or AliasMap[Name]
   if Func then
     return Func
@@ -279,7 +260,8 @@ local function GetMethod(self, Name)
 end
 local ModuleAPI = {
   missing = missing,
-  Safeget = safeget,
+  Console = console,
+  SafeGet = safeget,
   Services = Services,
   Player = plr,
   Character = char,
@@ -345,7 +327,7 @@ AddMethod("LoadModule", true, function(self, name)
     local modulefunc = loadstring(code)
     return modulefunc(self, ModuleAPI)
   end)
-  if not success then warn("Failed to load module :" .. name) return end
+  if not success then warn("Failed to load module :" .. name) warn(result) return end
   cache[name] = result
   return result
 end)
