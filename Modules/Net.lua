@@ -28,7 +28,7 @@ return function(lib, api)
     }
   }
   local Simple, Advanced, Utils, Configuration = Net.Simple, Net.Advanced, Net.Utils, Net.Configuration
-  local HookInstall, GlobalActivate = HookState.Installed, HookState.GlobalActivated
+  local HookInstall, GlobalActivate = HooksState.Installed, HooksState.GlobalActivated
   local BlockedRemotes, BlockedSpecial, BlockedFunctions, BlockedIndex, BlockedNewIndex = {}, {}, {}, {}, {}
   local HookedRemotes, HookedSpecial, HookedConnectSignal, HookedFunctions, HookedIndex, HookedNewIndex = {}, {}, {}, {}, {}, {}
   local HookedIndexS, HookedNewIndexS = {}, {}
