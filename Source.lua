@@ -332,9 +332,9 @@ AddMethod("LoadModule", true, function(self, name)
   end)
   if not success then
     if env.LCDebug then
-    warn("LoadModule: failed to load '" .. name .. "' – " .. tostring(result))
-    warn("Stack trace: " .. debug.traceback())
-    warn("Failed to load module: " .. name)
+      warn("LoadModule: failed to load '" .. name .. "' – " .. tostring(result))
+      warn("Stack trace: " .. debug.traceback())
+      warn("Failed to load module: " .. name)
     end
     return
   end
