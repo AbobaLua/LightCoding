@@ -331,12 +331,9 @@ AddMethod("LoadModule", true, function(self, name)
     return modulefunc(self, ModuleAPI)
   end)
   if not success then
-    if getgenv().LCDebug then
-      warn("LoadModule: failed to load '" .. name .. "' – " .. tostring(result))
-      warn("Stack trace: " .. debug.traceback())
-    else
-      warn("Failed to load module: " .. name)
-    end
+    warn("LoadModule: failed to load '" .. name .. "' – " .. tostring(result))
+    warn("Stack trace: " .. debug.traceback())
+    warn("Failed to load module: " .. name)
     return
   end
   cache[name] = result
