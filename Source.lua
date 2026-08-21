@@ -327,7 +327,11 @@ AddMethod("LoadModule", true, function(self, name)
     local modulefunc = loadstring(code)
     return modulefunc(self, ModuleAPI)
   end)
-  if not success then warn("Failed to load module :" .. name) warn(result) return end
+  if not success then
+    warn("Failed to load module :" .. name)
+    warn("Result" .. result)
+    return
+  end
   cache[name] = result
   return result
 end)
