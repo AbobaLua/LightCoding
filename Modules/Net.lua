@@ -1,4 +1,5 @@
 return function(lib, api)
+  local console = api.Console
   local Net = {
     Simple = {},
     Advanced = {},
@@ -275,7 +276,11 @@ return function(lib, api)
   function Simple.UnBlockFunction(func)
     if not func or not BlockedFunctions[func] then return end
     local original = BlockedFunctions[func]
-    local success = pcall(hookfunction, func, original)
+    if restorefunction then
+      local success = pcall(restorefunction, func)
+    else
+      local success = pcall(hookfunction, func, original)
+    end
     if not success then console("Failed to UnBlock") return end
     BlockedFunctions[func] = nil
   end
@@ -291,9 +296,13 @@ return function(lib, api)
     return original
   end
   function Advanced.UnHookFunction(func)
-    if not func or not HookedFunctions[func] then return end
+    if not (func and HookedFunctions[func]) then return end
     local original = HookedFunctions[func]
-    local success = pcall(hookfunction, func, original)
+    if restorefunction then
+      local success = pcall(restorefunction, func)
+    else
+      local success = pcall(hookfunction, func, original)
+    end
     if not success then console("Failed to UnHook") return end
     HookedFunctions[func] = nil
   end
