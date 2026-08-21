@@ -307,10 +307,10 @@ return function(lib, api)
   end
   function Simple.BlockIndex(obj, property)
     if not obj or not property then return end
-    if BlockedIndex[obj][property] then return "Index Property already Blocked on this object" end
     if not BlockedIndex[obj] then
       BlockedIndex[obj] = {}
     end
+    if BlockedIndex[obj][property] then return "Index Property already Blocked on this object" end
     BlockedIndex[obj][property] = true
     SetupIndex()
     ControlHooks()
