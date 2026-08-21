@@ -317,7 +317,7 @@ return function(lib, api)
     ControlHooks()
   end
   function Simple.UnBlockIndex(obj, property)
-    if not obj or not property or not BlockedIndex[obj] then then return end
+    if not obj or not property or not BlockedIndex[obj] then return end
     if property and BlockedIndex[obj][property] then
       BlockedIndex[obj][property] = nil
     else
@@ -349,7 +349,7 @@ return function(lib, api)
   function Simple.UnHookIndex(obj, property)
     if not obj or not HookedIndexS[obj] then return end
     if property and HookedIndexS[obj][property] then
-      HookedIndexS[ovj][property] = nil
+      HookedIndexS[obj][property] = nil
     else
       HookedIndexS[obj] = nil
     end
