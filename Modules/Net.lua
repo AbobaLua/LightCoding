@@ -36,16 +36,16 @@ return function(lib, api)
     local function check(t) 
       return next(t) ~= nil
     end
-    HookInstall.BlockRemoteInstall = check(BlockedRemotes)
-    HookInstall.HookRemoteInstall = check(HookedRemotes)
-    HookInstall.SpeficBlockInstall = check(BlockedSpecial)
-    HookInstall.SpeficHookInstall = check(HookedSpecial)
-    HookInstall.BlockIndexInstall = check(BlockedIndex)
-    HookInstall.HookIndexInstall = check(HookedIndex)
-    HookInstall.BlockNewIndexInstall = check(BlockedNewIndex)
-    HookInstall.HookNewIndexInstall = check(HookedNewIndex)
-    HookInstall.HookIndexSInstall = check(HookedIndexS)
-    HookInstall.HookNewIndexSInstall = check(HookedNewIndexS)
+    HookInstall.BlockRemote = check(BlockedRemotes)
+    HookInstall.HookRemote = check(HookedRemotes)
+    HookInstall.SpeficBlock = check(BlockedSpecial)
+    HookInstall.SpeficHook = check(HookedSpecial)
+    HookInstall.BlockIndex = check(BlockedIndex)
+    HookInstall.HookIndex = check(HookedIndex)
+    HookInstall.BlockNewIndex = check(BlockedNewIndex)
+    HookInstall.HookNewIndex = check(HookedNewIndex)
+    HookInstall.HookIndexS = check(HookedIndexS)
+    HookInstall.HookNewIndexS = check(HookedNewIndexS)
   end
   local ClassFire = {RemoteEvent = "FireServer", RemoteFunction = "InvokeServer", UnreliableRemoteEvent = "FireServer", BindableRemote = "Fire", BindableFunction = "Invoke"}
   local ClassType = {RemoteEvent = true, RemoteFunction = true, UnreliableRemoteEvent = true, BindableRemote = true, BindableFunction = true}
@@ -162,7 +162,6 @@ return function(lib, api)
       ControlHooks()
     end
   end
-
   function Advanced.UnHookRE(remote)
     if not remote then return end
     if HookedRemotes[remote] then
@@ -326,7 +325,7 @@ return function(lib, api)
     ControlHooks()
   end
   function Advanced.HookIndex(obj, callback)
-    if not obj or type(callback) ~= "function" then return end
+    if not (obj and callback and type(callback) == "function") then return end
     if HookedIndex[obj] then return "Index already hooked on this object" end
     HookedIndex[obj] = callback
     SetupIndex()
