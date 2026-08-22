@@ -130,7 +130,7 @@ return function(lib, api)
       return oldNewIndex(self, property, newValue)
     end))
   end
-  local function Simple.BlockRE(remote)
+  function Simple.BlockRE(remote)
     if not remote then return end
     if not ClassType[remote.ClassName] then return end
     if not BlockedRemotes[remote] then
@@ -142,7 +142,7 @@ return function(lib, api)
       ControlHooks()
     end
   end
-  local function Simple.UnBlockRE(remote)
+  function Simple.UnBlockRE(remote)
     if not remote then return end
     if BlockedRemotes[remote] then
       BlockedRemotes[remote] = nil
