@@ -131,7 +131,7 @@ Net.Simple.BlockRE(game.workspace.RemoteEvent)
 BlockMarker need to block call if you don't return BlockMarker or newargs will return original call  
 Default Block Marker - "%%Block%%"  
 Change the block marker:
-```luau
+```lua
 Net.Configuration.BlockMarker = "%Block%"
 ```
 #### UnBlockRE() - UnBlock remote
