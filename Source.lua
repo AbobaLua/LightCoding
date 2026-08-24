@@ -13,7 +13,7 @@ end
 local LightCoding = {
   Info = {
     Name = "Light coding",
-    Version = "1.22 Beta",
+    Version = "1.23 Beta",
     Author = {
       Name = "AbobaLua",
       URL = "https://github.com/AbobaLua"
