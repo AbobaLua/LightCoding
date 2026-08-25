@@ -1,6 +1,5 @@
 local env = (type(getgenv) == "function" and getgenv()) or _G
 if not game:IsLoaded() then game.Loaded:Wait() end
-if env.LCLoaded then return "Light Coding Already Loaded!" end
 local startTime = os.clock()
 local function missing(t, f, fallback)
   if type(f) == t then return f end
@@ -100,7 +99,6 @@ local function Initialization()
   if LightCoding and Settings then
     Settings.Loaded = true
   end
-  env.LCLoaded = true
   local loadTime = (os.clock() - startTime) * 1000
   print(string.format("Loaded in %.2f ms", loadTime))
 end
